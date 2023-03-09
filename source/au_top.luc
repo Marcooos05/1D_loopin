@@ -14,7 +14,7 @@ module au_top (
   sig rst;                  // reset signal
   
   beta_cpu beta(.clk(clk));
-  counter slowclock(#SIZE(27), .clk(clk), .rst(rst));
+  counter slowclock(#SIZE(28), .clk(clk), .rst(rst));
   edge_detector slowclockedge(#RISE(1), #FALL(0), .clk(clk));
   
   // ADDC(R31, 7, R1)
