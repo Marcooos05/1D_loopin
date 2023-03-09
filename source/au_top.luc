@@ -46,6 +46,10 @@ module au_top (
     rst = reset_cond.out;     // conditioned reset
     
     led = c{3b0, io_button};  // connect buttons to LEDs
+    io_led[2][7] = io_dip[2][7]; // see toggle manual/auto mode
+    io_led[2][6] = io_dip[2][6]; // see toggle fastclock 
+    io_led[2][5] = counter[27]; // see slowclock
+    io_led[2][4] = counter[25]; // see fastclock 
     
     usb_tx = usb_rx;          // loop serial port
     
