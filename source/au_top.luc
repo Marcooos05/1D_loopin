@@ -22,22 +22,14 @@ module au_top (
   counter slowclock(#SIZE(28), .clk(clk), .rst(rst));
   edge_detector slowclock_edge(#RISE(1), #FALL(0), .clk(clk));
   edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
+ 
+  const NUMBER_OF_INSTRUCTION = 5;
+  const MEMORY_SIZE = 16;
+  instructionrom instruction_unit(#WORDS(MEMORY_SIZE));
+  memoryunit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 16 * 32 bits 
   
-  // Driver code, ADDC is the first instruction, BNE is the last
-  const SAMPLE_CODE = {
-    32h7823FFFB, // BNE(R3, 0, R1) 
-    32h607F0020, // LD(R31, 32, R3) 
-    32h643F0020, // ST(R1, 32) 
-    32h90410800, // CMPEQ(R1, R1, R2) 
-    32hC03F0007 // ADDC(R31, 7, R1)
-  };
-  
-  const NUMBER_OF_INSTR = 5;
-  instructionrom instruction_unit(#WORDS(16));
-  memoryunit memory_unit(#DEPTH(16), .clk(clk)); // can fit 16 * 32 bits 
-  
-  dff writer_counter[$clog2(NUMBER_OF_INSTR)](.clk(clk));
-  fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, WAIT, RUN};
+  dff writer_counter[$clog2(NUMBER_OF_INSTRUCTION)](.clk(clk));
+  fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, RESET, RUN};
   
   multi_seven_seg seg(.clk(clk),.rst(rst));
   reset_conditioner reset_cond(.clk(clk));
@@ -101,11 +93,11 @@ module au_top (
             memory_unit.instruction_towrite = instruction_unit.out;
             memory_unit.instruction_write_enable = b1;
             memory_unit.ia = writer_counter.q<<2; // pad with two zeroes to make it byte addressable
-            if (writer_counter.q == NUMBER_OF_INSTR){
-                code_writer.d = code_writer.WAIT; // wait one more clock cycle to allow the last instruction to be loaded before start execution
+            if (writer_counter.q == NUMBER_OF_INSTRUCTION){
+                code_writer.d = code_writer.RESET; // wait one more clock cycle to allow the last instruction to be loaded before start execution
               }
       
-        code_writer.WAIT:
+        code_writer.RESET:
             // wait one cycle before reading from RAM after the last write
             // also, reset beta
             beta.rst = 1;
@@ -120,7 +112,7 @@ module au_top (
   io_seg = ~seg.seg;
   io_sel = ~seg.sel;
     
-  // debugger
+// debugger
   case (io_dip[0]){
     h00: // MSB 16 bits of current instruction
       io_led[0] = memory_unit.instruction[23:16];
@@ -142,27 +134,35 @@ module au_top (
       io_led[0] = beta.mem_data_address[23:16];
       io_led[1] = beta.mem_data_address[31:24];
       seg.values = {beta.mem_data_address[31:28], beta.mem_data_address[27:24], beta.mem_data_address[23:20], beta.mem_data_address[19:16]}; 
-    h05: // LSB 16 bits of Mem[EA] 
+    h05: // LSB 16 bits of Mem[EA]
+      io_led[0] = memory_unit.data_memory_output[7:0];
+      io_led[1] = memory_unit.data_memory_output[15:8];
+      seg.values = {memory_unit.data_memory_output[15:12], memory_unit.data_memory_output[11:8], memory_unit.data_memory_output[7:4], memory_unit.data_memory_output[3:0]}; 
+    h06: // MSB 16 bits of Mem[EA]
+      io_led[0] = memory_unit.data_memory_output[23:16];
+      io_led[1] = memory_unit.data_memory_output[31:24];
+      seg.values = {memory_unit.data_memory_output[31:28], memory_unit.data_memory_output[27:24], memory_unit.data_memory_output[23:20], memory_unit.data_memory_output[19:16]}; 
+    h07: // LSB 16 bits of RD2 (mwd[15:0]) 
       io_led[0] = beta.mem_data_output[7:0];
       io_led[1] = beta.mem_data_output[15:8];
       seg.values = {beta.mem_data_output[15:12], beta.mem_data_output[11:8], beta.mem_data_output[7:4], beta.mem_data_output[3:0]};
-    h06: // MSB 16 bits of Mem[EA]
+    h08: // MSB 16 bits of RD2 (mwd[31:16])
       io_led[0] = beta.mem_data_output[23:16];
       io_led[1] = beta.mem_data_output[31:24];
       seg.values = {beta.mem_data_output[31:28], beta.mem_data_output[27:24], beta.mem_data_output[23:20], beta.mem_data_output[19:16]};
-    h07: // LSB 16 bits of pcsel_out
+    h09: // LSB 16 bits of pcsel_out
       io_led[0] = beta.debug_pcsel[7:0];
       io_led[1] = beta.debug_pcsel[15:8];
       seg.values = {beta.debug_pcsel[15:12], beta.debug_pcsel[11:8], beta.debug_pcsel[7:4], beta.debug_pcsel[3:0]};
-    h08: // LSB 16 bits of asel_out
+    h0A: // LSB 16 bits of asel_out
       io_led[0] = beta.debug_asel[7:0];
       io_led[1] = beta.debug_asel[15:8];
       seg.values = {beta.debug_asel[15:12], beta.debug_asel[11:8], beta.debug_asel[7:4], beta.debug_asel[3:0]};
-    h09: // LSB 16 bits of bsel_out
+    h0B: // LSB 16 bits of bsel_out
       io_led[0] = beta.debug_bsel[7:0];
       io_led[1] = beta.debug_bsel[15:8];
       seg.values = {beta.debug_bsel[15:12], beta.debug_bsel[11:8], beta.debug_bsel[7:4], beta.debug_bsel[3:0]};
-    h0A: // LSB 16 bits of wdsel_out
+    h0C: // LSB 16 bits of wdsel_out
       io_led[0] = beta.debug_wdsel[7:0];
       io_led[1] = beta.debug_wdsel[15:8];
       seg.values = {beta.debug_wdsel[15:12], beta.debug_wdsel[11:8], beta.debug_wdsel[7:4], beta.debug_wdsel[3:0]};  
