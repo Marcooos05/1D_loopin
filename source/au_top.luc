@@ -61,7 +61,7 @@ module au_top (
     
     // driving the beta 
     slowclock_edge.in = slowclock.value[27];
-    fastclock_edge.in = slowclock.value[26];
+    fastclock_edge.in = slowclock.value[25];
     beta.interrupt = 0;
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q // proceed either when next button is pressed or io_dip[2][7] is 1
