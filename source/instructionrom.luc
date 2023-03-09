@@ -1,0 +1,20 @@
+module instructionrom #(
+    WORDS = 16 // total instructions in this ROM
+)(
+    input addr[$clog2(WORDS)], // this ROM is WORD addressable
+    output out[32]
+  ) {
+  
+   // Driver code, ADDC is the first instruction, BNE is the last
+  const INSTRUCTIONS = {
+    32h7823FFFB, // BNE(R3, 0, R1) 
+    32h607F0020, // LD(R31, 32, R3) 
+    32h643F0020, // ST(R1, 32) 
+    32h90410800, // CMPEQ(R1, R1, R2) 
+    32hC03F0007 // ADDC(R31, 7, R1)
+  };
+
+  always {
+    out = INSTRUCTIONS[addr];
+  }
+}

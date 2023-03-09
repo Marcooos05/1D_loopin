@@ -33,6 +33,7 @@ module au_top (
   };
   
   const NUMBER_OF_INSTR = 5;
+  instructionrom instruction_unit(#WORDS(16));
   memoryunit memory_unit(#DEPTH(16), .clk(clk)); // can fit 16 * 32 bits 
   
   dff writer_counter[$clog2(NUMBER_OF_INSTR)](.clk(clk));
@@ -48,6 +49,7 @@ module au_top (
     usb_tx = usb_rx;          // loop serial port
     io_seg = 8hff; // connect segments to the driver
     io_sel = 4hf; // connect digit select to the driver
+    instruction_unit.addr = 0; // always set to 0 initially
     
     led = c{3b0, io_button};  // connect buttons to LEDs
     io_led[2][7] = io_dip[2][7]; // see toggle manual/auto mode
@@ -95,7 +97,8 @@ module au_top (
         code_writer.INSTRUCTIONLOAD:
             beta.rst = 1;
             writer_counter.d = writer_counter.q + 1;
-            memory_unit.instruction_towrite = SAMPLE_CODE[writer_counter.q];
+            instruction_unit.addr = writer_counter.q;
+            memory_unit.instruction_towrite = instruction_unit.out;
             memory_unit.instruction_write_enable = b1;
             memory_unit.ia = writer_counter.q<<2; // pad with two zeroes to make it byte addressable
             if (writer_counter.q == NUMBER_OF_INSTR){
@@ -103,6 +106,8 @@ module au_top (
               }
       
         code_writer.WAIT:
+            // wait one cycle before reading from RAM after the last write
+            // also, reset beta
             beta.rst = 1;
             code_writer.d = code_writer.RUN;
         
