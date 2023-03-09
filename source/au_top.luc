@@ -44,6 +44,10 @@ module au_top (
   always {
     reset_cond.in = ~rst_n;   // input raw inverted reset signal
     rst = reset_cond.out;     // conditioned reset
+    io_led = 3x{{h00}};
+    usb_tx = usb_rx;          // loop serial port
+    io_seg = 8hff; // connect segments to the driver
+    io_sel = 4hf; // connect digit select to the driver
     
     led = c{3b0, io_button};  // connect buttons to LEDs
     io_led[2][7] = io_dip[2][7]; // see toggle manual/auto mode
@@ -51,12 +55,6 @@ module au_top (
     io_led[2][5] = slowclock.value[27]; // see slowclock
     io_led[2][4] = slowclock.value[25]; // see fastclock 
     
-    usb_tx = usb_rx;          // loop serial port
-    
-    io_led = 3x{{h00}};
-    io_seg = 8hff; // connect segments to the driver
-    io_sel = 4hf; // connect digit select to the driver
-
     // next button
     next_button_conditioner.in = io_button[4];
     next_button_edge.in = next_button_conditioner.out;
@@ -119,34 +117,50 @@ module au_top (
     
   // debugger
   case (io_dip[0]){
-    h00: // LSB 16 bits of instruction address
-      io_led[0] = beta.ia[7:0];
-      io_led[1] = beta.ia[15:8];
-      seg.values = {beta.ia[15:12], beta.ia[11:8], beta.ia[7:4], beta.ia[3:0]};
-    h01: // LSB 16 bits of EA (this is also ALU output)
-      io_led[0] = beta.mem_data_address[7:0];
-      io_led[1] = beta.mem_data_address[15:8];
-      seg.values = {beta.mem_data_address[15:12], beta.mem_data_address[11:8], beta.mem_data_address[7:4], beta.mem_data_address[3:0]};
-    h02: // MSB 16 bits of EA (this is also ALU output)
-      io_led[0] = beta.mem_data_address[23:16];
-      io_led[1] = beta.mem_data_address[31:24];
-      seg.values = {beta.mem_data_address[31:28], beta.mem_data_address[27:24], beta.mem_data_address[23:20], beta.mem_data_address[19:16]}; 
-    h03: // LSB 16 bits of Mem[EA] 
-      io_led[0] = beta.mem_data_output[7:0];
-      io_led[1] = beta.mem_data_output[15:8];
-      seg.values = {beta.mem_data_output[15:12], beta.mem_data_output[11:8], beta.mem_data_output[7:4], beta.mem_data_output[3:0]};
-    h04: // MSB 16 bits of Mem[EA]
-      io_led[0] = beta.mem_data_output[23:16];
-      io_led[1] = beta.mem_data_output[31:24];
-      seg.values = {beta.mem_data_output[31:28], beta.mem_data_output[27:24], beta.mem_data_output[23:20], beta.mem_data_output[19:16]};
-    h05: // LSB 16 bits of current instruction
-      io_led[0] = memory_unit.instruction[7:0];
-      io_led[1] = memory_unit.instruction[15:8];
-      seg.values = {memory_unit.instruction[15:12], memory_unit.instruction[11:8], memory_unit.instruction[7:4], memory_unit.instruction[3:0]}; 
-    h06: // MSB 16 bits of current instruction
+    h00: // MSB 16 bits of current instruction
       io_led[0] = memory_unit.instruction[23:16];
       io_led[1] = memory_unit.instruction[31:24];
       seg.values = {memory_unit.instruction[31:28], memory_unit.instruction[27:24], memory_unit.instruction[23:20], memory_unit.instruction[19:16]};
+    h01: // LSB 16 bits of current instruction
+      io_led[0] = memory_unit.instruction[7:0];
+      io_led[1] = memory_unit.instruction[15:8];
+      seg.values = {memory_unit.instruction[15:12], memory_unit.instruction[11:8], memory_unit.instruction[7:4], memory_unit.instruction[3:0]}; 
+    h02: // LSB 16 bits of instruction address
+      io_led[0] = beta.ia[7:0];
+      io_led[1] = beta.ia[15:8];
+      seg.values = {beta.ia[15:12], beta.ia[11:8], beta.ia[7:4], beta.ia[3:0]};
+    h03: // LSB 16 bits of EA (this is also ALU output)
+      io_led[0] = beta.mem_data_address[7:0];
+      io_led[1] = beta.mem_data_address[15:8];
+      seg.values = {beta.mem_data_address[15:12], beta.mem_data_address[11:8], beta.mem_data_address[7:4], beta.mem_data_address[3:0]};
+    h04: // MSB 16 bits of EA (this is also ALU output)
+      io_led[0] = beta.mem_data_address[23:16];
+      io_led[1] = beta.mem_data_address[31:24];
+      seg.values = {beta.mem_data_address[31:28], beta.mem_data_address[27:24], beta.mem_data_address[23:20], beta.mem_data_address[19:16]}; 
+    h05: // LSB 16 bits of Mem[EA] 
+      io_led[0] = beta.mem_data_output[7:0];
+      io_led[1] = beta.mem_data_output[15:8];
+      seg.values = {beta.mem_data_output[15:12], beta.mem_data_output[11:8], beta.mem_data_output[7:4], beta.mem_data_output[3:0]};
+    h06: // MSB 16 bits of Mem[EA]
+      io_led[0] = beta.mem_data_output[23:16];
+      io_led[1] = beta.mem_data_output[31:24];
+      seg.values = {beta.mem_data_output[31:28], beta.mem_data_output[27:24], beta.mem_data_output[23:20], beta.mem_data_output[19:16]};
+    h07: // LSB 16 bits of pcsel_out
+      io_led[0] = beta.debug_pcsel[7:0];
+      io_led[1] = beta.debug_pcsel[15:8];
+      seg.values = {beta.debug_pcsel[15:12], beta.debug_pcsel[11:8], beta.debug_pcsel[7:4], beta.debug_pcsel[3:0]};
+    h08: // LSB 16 bits of asel_out
+      io_led[0] = beta.debug_asel[7:0];
+      io_led[1] = beta.debug_asel[15:8];
+      seg.values = {beta.debug_asel[15:12], beta.debug_asel[11:8], beta.debug_asel[7:4], beta.debug_asel[3:0]};
+    h09: // LSB 16 bits of bsel_out
+      io_led[0] = beta.debug_bsel[7:0];
+      io_led[1] = beta.debug_bsel[15:8];
+      seg.values = {beta.debug_bsel[15:12], beta.debug_bsel[11:8], beta.debug_bsel[7:4], beta.debug_bsel[3:0]};
+    h0A: // LSB 16 bits of wdsel_out
+      io_led[0] = beta.debug_wdsel[7:0];
+      io_led[1] = beta.debug_wdsel[15:8];
+      seg.values = {beta.debug_wdsel[15:12], beta.debug_wdsel[11:8], beta.debug_wdsel[7:4], beta.debug_wdsel[3:0]};  
   }
   }
 }

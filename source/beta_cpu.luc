@@ -8,7 +8,11 @@ module beta_cpu (
     output ia[32],
     output mem_data_address[32],
     output mem_data_output[32],
-    output wr
+    output wr,
+    output debug_pcsel[16],
+    output debug_asel[16],
+    output debug_bsel[16],
+    output debug_wdsel[16],
 
   ) {
   
@@ -17,6 +21,13 @@ module beta_cpu (
   regfile regfile_system(.clk(clk));
   
   dff pc[32](#INIT(0),.clk(clk));
+
+  sig asel_out;
+  sig bsel_out;
+  sig ra2sel_out;
+  sig wasel_out;
+  sig wdsel_out;
+  sig pcsel_out;
 
   always {
   
@@ -36,89 +47,102 @@ module beta_cpu (
       // PCSEL mux 
       case (control_system.pcsel){
           b000: 
-            pc.d = pc.q + 4;
+            pcsel_out = pc.q + 4;
           b001:
-            pc.d = pc.q + 4 + 4 * c{instruction[15], instruction[15:0]};
+            pcsel_out = pc.q + 4 + 4 * c{instruction[15], instruction[15:0]};
           b010:
             // protect JT bit 31
-            pc.d = c{pc.q[31] && regfile_system.read_data_1[31],regfile_system.read_data_1[30:0]};
+            pcsel_out = c{pc.q[31] && regfile_system.read_data_1[31],regfile_system.read_data_1[30:0]};
           b011:
-            pc.d = h00000008; // illop 
+            pcsel_out = h00000008; // illop 
           b100: 
-            pc.d = h00000004; // irq 
+            pcsel_out = h00000004; // irq 
           default:
-            pc.d = pc.q;
+            pcsel_out = pc.q;
         }
+      pc.d = pcsel_out; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if(slowclk) clause
     }
     
     //reset mux 
     if (rst){
-        pc.d = 32b0;
+        pc.d = 32b0; // reset can happen anytime regardless of slowclk
     }
     
     //*****REGFILE*******//
     // RA2SEL mux
     case(control_system.ra2sel){
       b0:
-        regfile_system.read_address_2 = instruction[15:11];
+        ra2sel_out = instruction[15:11];
       b1:
-        regfile_system.read_address_2 = instruction[25:21];
+        ra2sel_out = instruction[25:21];
       default:
-        regfile_system.read_address_2 = instruction[15:11];
+        ra2sel_out = instruction[15:11];
     }
-    
+
     // WASEL mux 
     case(control_system.wasel){
       b0:
-        regfile_system.write_address = instruction[25:21];
+        wasel_out = instruction[25:21];
       b1:
-        regfile_system.write_address = b11110;
+        wasel_out = b11110;
       default:
-        regfile_system.write_address = instruction[25:21];
+        wasel_out = instruction[25:21];
     }
     
+    regfile_system.read_address_2 = ra2sel_out;
     regfile_system.read_address_1 = instruction[20:16];
+    regfile_system.write_address = wasel_out;
 
     control_system.z = ~|regfile_system.read_data_1;
     mem_data_output = regfile_system.read_data_2;
     
     //******ALU*******//
+    // ASEL mux
     alu_system.alufn_signal = control_system.alufn;
     case(control_system.asel){
       b0:
-        alu_system.a = regfile_system.read_data_1;
+        asel_out = regfile_system.read_data_1;
       b1:
-        alu_system.a = pc.q + 4 + 4 * c{instruction[15], instruction[15:0]};
+        asel_out = pc.q + 4 + 4 * c{instruction[15], instruction[15:0]};
       default:
-        alu_system.a = regfile_system.read_data_1;
+        asel_out = regfile_system.read_data_1;
     }
-    
+
+    // BSEL mux
     case(control_system.bsel){
       b0:
-        alu_system.b = regfile_system.read_data_2;
+        bsel_out = regfile_system.read_data_2;
       b1:
-        alu_system.b = c{instruction[15], instruction[15:0]};
+        bsel_out = c{instruction[15], instruction[15:0]};
         
       default:
-        alu_system.b = regfile_system.read_data_2;
+        bsel_out = regfile_system.read_data_2;
     }
+
     
-    
-    // wdsel mux
+    // WDSEL mux
     case(control_system.wdsel){
       b00:
-        regfile_system.write_data = pc.q + 4;
+        wdsel_out = pc.q + 4;
       b01: 
-        regfile_system.write_data = alu_system.out;
+        wdsel_out = alu_system.out;
       b10:
-        regfile_system.write_data = mem_data_input;
+        wdsel_out = mem_data_input;
       default:
-        regfile_system.write_data = alu_system.out;
+        wdsel_out = alu_system.out;
     } 
     
+    alu_system.a = asel_out;
+    alu_system.b = bsel_out; 
+    regfile_system.write_data = wdsel_out;
     mem_data_address = alu_system.out;
     wr = control_system.wr;
-    
+
+    // debug values
+    debug_pcsel[15:0] = pcsel_out[15:0]
+    debug_asel[31:16] = asel_out[15:0]
+    debug_bsel[47:32] = bsel_out[15:0]
+    debug_wdsel[63:48] = wdsel_out[15:0] 
 
   }
 }
