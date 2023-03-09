@@ -9,7 +9,7 @@ module memoryunit #(
     input raddr[$clog2(DEPTH)+2],
     input waddr[$clog2(DEPTH)+2],
     input data_memory_input[32],
-    input xwr,
+    input wr,
     output data_memory_output[32],
             
     // for instruction memory 
@@ -33,7 +33,7 @@ module memoryunit #(
     data_memory.raddr = raddr[$clog2(DEPTH)+2-1:2]; // memory_unit is word addressable in Lucid, ignore two LSB
     data_memory.waddr = waddr[$clog2(DEPTH)+2-1:2];// memory_unit is word addressable in Lucid, ignore two LSB
     data_memory.write_data = data_memory_input;
-    data_memory.write_en = xwr;
+    data_memory.write_en = wr;
     data_memory_output = data_memory.read_data;
     
   }

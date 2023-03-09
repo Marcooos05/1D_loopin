@@ -8,7 +8,7 @@ module beta_cpu (
     output ia[32],
     output mem_data_address[32],
     output mem_data_output[32],
-    output xwr
+    output wr
 
   ) {
   
@@ -32,7 +32,7 @@ module beta_cpu (
 
     // advance the PC only when slowclk is 1 
     if (slowclk){ 
-        regfile_system.write_enable = control_system.werf;
+      regfile_system.write_enable = control_system.werf;
       // PCSEL mux 
       case (control_system.pcsel){
           b000: 
@@ -40,7 +40,7 @@ module beta_cpu (
           b001:
             pc.d = pc.q + 4 + 4 * c{instruction[15], instruction[15:0]};
           b010:
-            // protect jump
+            // protect JT bit 31
             pc.d = c{pc.q[31] && regfile_system.read_data_1[31],regfile_system.read_data_1[30:0]};
           b011:
             pc.d = h00000008; // illop 
@@ -57,7 +57,6 @@ module beta_cpu (
     }
     
     //*****REGFILE*******//
-    
     // RA2SEL mux
     case(control_system.ra2sel){
       b0:
@@ -118,7 +117,7 @@ module beta_cpu (
     } 
     
     mem_data_address = alu_system.out;
-    xwr = control_system.xwr;
+    wr = control_system.wr;
     
 
   }

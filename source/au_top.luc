@@ -82,7 +82,7 @@ module au_top (
     beta.mem_data_input = memory_unit.data_memory_output;
     memory_unit.ia = beta.ia[31:0]; 
     memory_unit.data_memory_input = beta.mem_data_output; 
-    memory_unit.xwr = beta.xwr; 
+    memory_unit.wr = beta.wr; 
     memory_unit.waddr = beta.mem_data_address[31:0]; 
     memory_unit.raddr = beta.mem_data_address[31:0]; 
   
