@@ -59,17 +59,9 @@ module au_top (
     // driving the beta 
     slowclockedge.in = slowclock.value[27];
     beta.interrupt = 0;
-    beta.slowclk = slowclockedge.out & io_dip[0][0]; // start
+    beta.slowclk = slowclockedge.out & io_dip[2][7]; // start
     beta.rst = rst;
-    
-    // for debug
-    io_led[0] = beta.ia[7:0]; //current pc value
-    io_led[1] = beta.mem_data_address[7:0]; // output of the ALU 
-    io_led[2] = beta.mem_data_output[7:0]; // output of the rb_data   
-    
-    led[7:2] = memory_unit.instruction[31:26];// current instruction opcode 
-    led[2:0] = memory_unit.data_memory_output; // 32 bit output from data memory 
-
+  
     // connect memory unit with beta 
     beta.instruction = memory_unit.instruction;
     beta.mem_data_input = memory_unit.data_memory_output;
@@ -105,6 +97,19 @@ module au_top (
             code_writer.d = code_writer.RUN;
     
     }
-    
+
+  // debugger
+  case (io_dip[0]){
+    h00:
+      io_led = beta.ia
+    h01:
+      io_led = beta.mem_data_address
+    h02:
+      io_led = beta.mem_data_output
+    h03: 
+      memory_unit.instruction
+    h04:
+      memory_unit.data_memory_output
+  }
   }
 }
