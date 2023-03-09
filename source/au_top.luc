@@ -100,6 +100,8 @@ module au_top (
     }
 
   seg.values = {4b0,4b0,4b0,4b0};
+  io_seg = ~seg.seg;
+  io_sel = ~seg.sel;
     
   // debugger
   case (io_dip[0]){
@@ -107,20 +109,22 @@ module au_top (
       io_led[0] = beta.ia[7:0];
       io_led[1] = beta.ia[15:8];
       seg.values = {beta.ia[15:12], beta.ia[11:8], beta.ia[7:4], beta.ia[3:0]};
-      io_seg = ~seg.seg;
-      io_sel = ~seg.sel;
     h01: // LSB 16 bits of EA
       io_led[0] = beta.mem_data_address[7:0];
       io_led[1] = beta.mem_data_address[15:8];
+      seg.values = {beta.mem_data_address[15:12], beta.mem_data_address[11:8], beta.mem_data_address[7:4], beta.mem_data_address[3:0]};
     h02: // LSB 16 bits of Mem[EA]
       io_led[0] = beta.mem_data_output[7:0];
       io_led[1] = beta.mem_data_output[15:8];
+      seg.values = {beta.mem_data_output[15:12], beta.mem_data_output[11:8], beta.mem_data_output[7:4], beta.mem_data_output[3:0]};
     h03: // LSB 16 bits of current instruction
       io_led[0] = memory_unit.instruction[7:0];
       io_led[1] = memory_unit.instruction[15:8];
+      seg.values = {memory_unit.instruction[15:12], memory_unit.instruction[11:8], memory_unit.instruction[7:4], memory_unit.instruction[3:0]}; 
     h04: // MSB 16 bits of current instruction
-     io_led[0] = memory_unit.instruction[23:16];
-     io_led[1] = memory_unit.instruction[31:24];
+      io_led[0] = memory_unit.instruction[23:16];
+      io_led[1] = memory_unit.instruction[31:24];
+      seg.values = {memory_unit.instruction[31:28], memory_unit.instruction[27:24], memory_unit.instruction[23:20], memory_unit.instruction[19:16]};
   }
   }
 }
