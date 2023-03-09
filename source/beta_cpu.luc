@@ -22,12 +22,12 @@ module beta_cpu (
   
   dff pc[32](#INIT(0),.clk(clk));
 
-  sig asel_out;
-  sig bsel_out;
-  sig ra2sel_out;
-  sig wasel_out;
-  sig wdsel_out;
-  sig pcsel_out;
+  sig asel_out[32];
+  sig bsel_out[32];
+  sig ra2sel_out[5];
+  sig wasel_out[5];
+  sig wdsel_out[32];
+  sig pcsel_out[32];
 
   always {
   
