@@ -139,10 +139,10 @@ module beta_cpu (
     wr = control_system.wr;
 
     // debug values
-    debug_pcsel[15:0] = pcsel_out[15:0]
-    debug_asel[15:0] = asel_out[15:0]
-    debug_bsel[15:0] = bsel_out[15:0]
-    debug_wdsel[15:0] = wdsel_out[15:0] 
+    debug_pcsel[15:0] = pcsel_out[15:0];
+    debug_asel[15:0] = asel_out[15:0];
+    debug_bsel[15:0] = bsel_out[15:0];
+    debug_wdsel[15:0] = wdsel_out[15:0];
 
   }
 }
