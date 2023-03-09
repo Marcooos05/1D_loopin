@@ -1,5 +1,5 @@
 module adder (
-// Note: a & b are 8-bit inputs. ALUFN is a 6-bit input
+// Note: a & b are 32-bit inputs. ALUFN is a 6-bit input
 // z, v, n are all 1-bit outputs.
     input a[32],
     input b[32],
