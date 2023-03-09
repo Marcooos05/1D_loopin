@@ -12,6 +12,7 @@ module au_top (
   ) {
   
   sig rst;                  // reset signal
+  sig next;                 // next instruction signal
 
   dff next_button(.clk(clk));
   button_conditioner next_button_conditioner(.clk(clk));
@@ -20,6 +21,7 @@ module au_top (
   beta_cpu beta(.clk(clk));
   counter slowclock(#SIZE(28), .clk(clk), .rst(rst));
   edge_detector slowclock_edge(#RISE(1), #FALL(0), .clk(clk));
+  edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
   
   // Driver code, ADDC is the first instruction, BNE is the last
   const SAMPLE_CODE = {
@@ -59,8 +61,16 @@ module au_top (
     
     // driving the beta 
     slowclock_edge.in = slowclock.value[27];
+    fastclock_edge.in = slowclock.value[26];
     beta.interrupt = 0;
-    beta.slowclk = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
+
+    next = (slowclock_edge.out & io_dip[2][7]) | next_button.q // proceed either when next button is pressed or io_dip[2][7] is 1
+
+    if (io_dip[2][6]){ // want faster clock
+     next = (fastclock_edge.out & io_dip[2][7]) | next_button.q 
+    }
+
+    beta.slowclk = next; 
     beta.rst = rst;
   
     // connect memory unit with beta 
@@ -109,19 +119,27 @@ module au_top (
       io_led[0] = beta.ia[7:0];
       io_led[1] = beta.ia[15:8];
       seg.values = {beta.ia[15:12], beta.ia[11:8], beta.ia[7:4], beta.ia[3:0]};
-    h01: // LSB 16 bits of EA
+    h01: // LSB 16 bits of EA (this is also ALU output)
       io_led[0] = beta.mem_data_address[7:0];
       io_led[1] = beta.mem_data_address[15:8];
       seg.values = {beta.mem_data_address[15:12], beta.mem_data_address[11:8], beta.mem_data_address[7:4], beta.mem_data_address[3:0]};
-    h02: // LSB 16 bits of Mem[EA]
+    h02: // MSB 16 bits of EA (this is also ALU output)
+      io_led[0] = beta.mem_data_address[23:16];
+      io_led[1] = beta.mem_data_address[31:24];
+      seg.values = {beta.mem_data_address[31:28], beta.mem_data_address[27:24], beta.mem_data_address[23:20], beta.mem_data_address[19:16]}; 
+    h03: // LSB 16 bits of Mem[EA] 
       io_led[0] = beta.mem_data_output[7:0];
       io_led[1] = beta.mem_data_output[15:8];
       seg.values = {beta.mem_data_output[15:12], beta.mem_data_output[11:8], beta.mem_data_output[7:4], beta.mem_data_output[3:0]};
-    h03: // LSB 16 bits of current instruction
+    h04: // MSB 16 bits of Mem[EA]
+      io_led[0] = beta.mem_data_output[23:16];
+      io_led[1] = beta.mem_data_output[31:24];
+      seg.values = {beta.mem_data_output[31:28], beta.mem_data_output[27:24], beta.mem_data_output[23:20], beta.mem_data_output[19:16]};
+    h05: // LSB 16 bits of current instruction
       io_led[0] = memory_unit.instruction[7:0];
       io_led[1] = memory_unit.instruction[15:8];
       seg.values = {memory_unit.instruction[15:12], memory_unit.instruction[11:8], memory_unit.instruction[7:4], memory_unit.instruction[3:0]}; 
-    h04: // MSB 16 bits of current instruction
+    h06: // MSB 16 bits of current instruction
       io_led[0] = memory_unit.instruction[23:16];
       io_led[1] = memory_unit.instruction[31:24];
       seg.values = {memory_unit.instruction[31:28], memory_unit.instruction[27:24], memory_unit.instruction[23:20], memory_unit.instruction[19:16]};
