@@ -48,8 +48,8 @@ module au_top (
     led = c{3b0, io_button};  // connect buttons to LEDs
     io_led[2][7] = io_dip[2][7]; // see toggle manual/auto mode
     io_led[2][6] = io_dip[2][6]; // see toggle fastclock 
-    io_led[2][5] = counter[27]; // see slowclock
-    io_led[2][4] = counter[25]; // see fastclock 
+    io_led[2][5] = slowclock.value[27]; // see slowclock
+    io_led[2][4] = slowclock.value[25]; // see fastclock 
     
     usb_tx = usb_rx;          // loop serial port
     
@@ -68,10 +68,10 @@ module au_top (
     fastclock_edge.in = slowclock.value[25];
     beta.interrupt = 0;
 
-    next = (slowclock_edge.out & io_dip[2][7]) | next_button.q // proceed either when next button is pressed or io_dip[2][7] is 1
+    next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
 
     if (io_dip[2][6]){ // want faster clock
-     next = (fastclock_edge.out & io_dip[2][7]) | next_button.q 
+     next = (fastclock_edge.out & io_dip[2][7]) | next_button.q; 
     }
 
     beta.slowclk = next; 
