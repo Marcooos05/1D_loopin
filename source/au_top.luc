@@ -14,7 +14,7 @@ module au_top (
   sig rst;                  // reset signal
 
   dff next_button(.clk(clk));
-  button_conditioner next_button_conditioner;
+  button_conditioner next_button_conditioner(.clk(clk));
   edge_detector next_button_edge(#RISE(1), #FALL(0), .clk(clk));
 
   beta_cpu beta(.clk(clk));
@@ -61,17 +61,22 @@ module au_top (
     io_sel = 4b0; // connect digit select to the driver
 
     // next button
-    next_button_conditioner.in = io_button[5];
-    next_button_edge = next_button_conditioner.out;
+    next_button_conditioner.in = io_button[4];
+    next_button_edge.in = next_button_conditioner.out;
 
     if (~next_button.q){
       next_button.d = next_button_edge.out;
     }
     
+    // reset next button dff if slowlock_edge is 1 this cycle 
+    if (next_button.q & slowclock_edge.out){
+      next_button.d = 0;
+    }
+
     // driving the beta 
     slowclock_edge.in = slowclock.value[27];
     beta.interrupt = 0;
-    beta.slowclk = slowclock_edge.out & io_dip[2][7]; // start
+    beta.slowclk = slowclock_edge.out & (io_dip[2][7] | next_button.q); // proceed either when next button is pressed or io_dip[2][7] is 1
     beta.rst = rst;
   
     // connect memory unit with beta 
