@@ -21,18 +21,13 @@ module au_top (
   counter slowclock(#SIZE(28), .clk(clk), .rst(rst));
   edge_detector slowclock_edge(#RISE(1), #FALL(0), .clk(clk));
   
-  // ADDC(R31, 7, R1)
-  // CMPEQ(R1, R1, R2)
-  // ST(R1, 32)
-  // LD(R31, 32, R3)
-  // BNE(R3, 0, R1)
-
+  // Driver code, ADDC is the first instruction, BNE is the last
   const SAMPLE_CODE = {
-    32h7823FFFB, 
-    32h607F0020, 
-    32h643F0020, 
-    32h90410800, 
-    32hC03F0007
+    32h7823FFFB, // BNE(R3, 0, R1) 
+    32h607F0020, // LD(R31, 32, R3) 
+    32h643F0020, // ST(R1, 32) 
+    32h90410800, // CMPEQ(R1, R1, R2) 
+    32hC03F0007 // ADDC(R31, 7, R1)
   };
   
   const NUMBER_OF_INSTR = 5;
@@ -41,12 +36,8 @@ module au_top (
   dff writer_counter[$clog2(NUMBER_OF_INSTR)](.clk(clk));
   fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, WAIT, RUN};
   
-  .clk(clk) {
-    // The reset conditioner is used to synchronize the reset signal to the FPGA
-    // clock. This ensures the entire FPGA comes out of reset at the same time.
-    reset_conditioner reset_cond;
- 
-  }
+  multi_seven_seg seg(.rst(rst));
+  reset_conditioner reset_cond(.clk(clk));
   
   always {
     reset_cond.in = ~rst_n;   // input raw inverted reset signal
@@ -57,8 +48,8 @@ module au_top (
     usb_tx = usb_rx;          // loop serial port
     
     io_led = 3x{{h00}};
-    io_seg = 8b0; // connect segments to the driver
-    io_sel = 4b0; // connect digit select to the driver
+    io_seg = 8hff; // connect segments to the driver
+    io_sel = 4hf; // connect digit select to the driver
 
     // next button
     next_button_conditioner.in = io_button[4];
@@ -113,6 +104,9 @@ module au_top (
     h00: // LSB 16 bits of instruction address
       io_led[0] = beta.ia[7:0];
       io_led[1] = beta.ia[15:8];
+      seg.values = {beta.ia[15:12], beta.ia[11:8], beta.ia[7:4], beta.ia[3:0]};
+      io_seg = ~seg.seg;
+      io_sel = ~seg.sel;
     h01: // LSB 16 bits of EA
       io_led[0] = beta.mem_data_address[7:0];
       io_led[1] = beta.mem_data_address[15:8];
