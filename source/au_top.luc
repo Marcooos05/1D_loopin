@@ -36,7 +36,7 @@ module au_top (
   dff writer_counter[$clog2(NUMBER_OF_INSTR)](.clk(clk));
   fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, WAIT, RUN};
   
-  multi_seven_seg seg(.rst(rst));
+  multi_seven_seg seg(.clk(clk),.rst(rst));
   reset_conditioner reset_cond(.clk(clk));
   
   always {
@@ -99,6 +99,8 @@ module au_top (
     
     }
 
+  seg.values = {4b0,4b0,4b0,4b0};
+    
   // debugger
   case (io_dip[0]){
     h00: // LSB 16 bits of instruction address
