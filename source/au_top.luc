@@ -101,20 +101,20 @@ module au_top (
   // debugger
   case (io_dip[0]){
     h00: // LSB 16 bits of instruction address
-      io_led[0] = beta.ia[7:0]
-      io_led[1] = beta.ia[15:8]
+      io_led[0] = beta.ia[7:0];
+      io_led[1] = beta.ia[15:8];
     h01: // LSB 16 bits of EA
-      io_led[0] = beta.mem_data_address[7:0]
-      io_led[1] = beta.mem_data_address[15:8]
+      io_led[0] = beta.mem_data_address[7:0];
+      io_led[1] = beta.mem_data_address[15:8];
     h02: // LSB 16 bits of Mem[EA]
-      io_led[0] = beta.mem_data_output[7:0]
-      io_led[1] = beta.mem_data_output[15:8]
+      io_led[0] = beta.mem_data_output[7:0];
+      io_led[1] = beta.mem_data_output[15:8];
     h03: // LSB 16 bits of current instruction
-      io_led[0] = memory_unit.instruction[7:0]
-      io_led[1] = memory_unit.instruction[15:8] 
+      io_led[0] = memory_unit.instruction[7:0];
+      io_led[1] = memory_unit.instruction[15:8];
     h04: // MSB 16 bits of current instruction
-     io_led[0] = memory_unit.instruction[23:16]
-     io_led[1] = memory_unit.instruction[31:24]
+     io_led[0] = memory_unit.instruction[23:16];
+     io_led[1] = memory_unit.instruction[31:24];
   }
   }
 }
