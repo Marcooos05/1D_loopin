@@ -11,24 +11,31 @@ module au_top (
     input io_dip [3][8]     // DIP switches on IO Shield
   ) {
   
-  sig rst;                  // reset signa
- // control_unit control;   // for test
+  sig rst;                  // reset signal
   
   beta_cpu beta(.clk(clk));
   counter slowclock(#SIZE(27), .clk(clk), .rst(rst));
   edge_detector slowclockedge(#RISE(1), #FALL(0), .clk(clk));
   
-//ADDC(R31, 7, R1)
-//CMPEQ(R1, R1, R2)
-//ST(R1, 32)
-//LD(R31, 32, R3)
-//BNE(R3, 0, R1)
-  const SAMPLE_CODE = {32h7823FFFB, 32h607F0020, 32h643F0020, 32h90410800, 32hC03F0007};
+  // ADDC(R31, 7, R1)
+  // CMPEQ(R1, R1, R2)
+  // ST(R1, 32)
+  // LD(R31, 32, R3)
+  // BNE(R3, 0, R1)
+
+  const SAMPLE_CODE = {
+    32h7823FFFB, 
+    32h607F0020, 
+    32h643F0020, 
+    32h90410800, 
+    32hC03F0007
+  };
+  
   const NUMBER_OF_INSTR = 5;
   memoryunit memory_unit(#DEPTH(16), .clk(clk)); // can fit 16 * 32 bits 
   
   dff writer_counter[$clog2(NUMBER_OF_INSTR)](.clk(clk));
-  fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, WAIT, GO};
+  fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, WAIT, RUN};
   
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
@@ -49,80 +56,55 @@ module au_top (
     io_seg = 8b0; // connect segments to the driver
     io_sel = 4b0; // connect digit select to the driver
     
+    // driving the beta 
+    slowclockedge.in = slowclock.value[27];
+    beta.interrupt = 0;
+    beta.slowclk = slowclockedge.out;
+    beta.rst = rst;
     
-    // ****** CU test ******* //
-//    control.z = io_dip[0][0];
-//    control.reset = io_dip[0][1];
-//    control.irq = io_dip[0][2];
-//    control.opcode = io_dip[1][5:0];
+    // for debug
+    io_led[0] = beta.ia[7:0]; //current pc value
+    io_led[1] = beta.mem_data_address[7:0]; // output of the ALU 
+    io_led[2] = beta.mem_data_output[7:0]; // output of the rb_data   
     
-//    io_led[2][7:5] = control.pcsel;
-//    io_led[2][4] = control.wasel;
-//    io_led[2][3] = control.asel;
-//    io_led[2][2] = control.ra2sel;
-//    io_led[2][1] = control.bsel;
-//    io_led[2][0] = control.alufn[5];
-//    io_led[1][7:3] = control.alufn[4:0]; 
-//    io_led[1][2:1] = control.wdsel;
-//    io_led[1][0] = control.werf;
-//    io_led[0][7:6] = c{control.moe, control.xwr};
-    // ******************* //
+    led[7:2] = memory_unit.instruction[31:26];// current instruction opcode 
+    led[2:0] = memory_unit.data_memory_output; // 32 bit output from data memory 
 
+    // connect memory unit with beta 
+    beta.instruction = memory_unit.instruction;
+    beta.mem_data_input = memory_unit.data_memory_output;
+    memory_unit.ia = beta.ia[31:0]; 
+    memory_unit.data_memory_input = beta.mem_data_output; 
+    memory_unit.xwr = beta.xwr; 
+    memory_unit.waddr = beta.mem_data_address[31:0]; 
+    memory_unit.raddr = beta.mem_data_address[31:0]; 
+  
+    // turn off instruction loading
+    memory_unit.instruction_write_enable = b0;
+    memory_unit.instruction_towrite = 32b0; 
     
-      // general setup of beta 
-      slowclockedge.in = slowclock.value[26];
-      beta.interrupt = 0;
-      beta.slowclk = slowclockedge.out;
-      beta.rst = 0;
+  
+    // write some values to RAM first, then run the beta 
+    case(code_writer.q){
+        // instruction loading
+        code_writer.INSTRUCTIONLOAD:
+            beta.rst = 1;
+            writer_counter.d = writer_counter.q + 1;
+            memory_unit.instruction_towrite = SAMPLE_CODE[writer_counter.q];
+            memory_unit.instruction_write_enable = b1;
+            memory_unit.ia = writer_counter.q<<2; // pad with two zeroes to make it byte addressable
+            if (writer_counter.q == NUMBER_OF_INSTR){
+                code_writer.d = code_writer.WAIT; // wait one more clock cycle to allow the last instruction to be loaded before start execution
+              }
       
-      // for debug
-      io_led[0] = beta.ia[7:0]; //current pc value
-      io_led[1] = beta.mem_data_address[7:0]; //output of the ALU 
-      io_led[2] = beta.mem_data_output[7:0]; //output of the rb_data   
-      
-      //led[7:2] = beta.debug[5:0];
-      led[7:2] = memory_unit.instruction[31:26];//current instruction opcode 
-      led[2:0] = memory_unit.data_memory_output; //32 bit output from data memory 
-    
-
-    
-    
-      // connect memory unit with beta 
-      beta.instruction = memory_unit.instruction;
-      beta.mem_data_input = memory_unit.data_memory_output;
-      memory_unit.ia = beta.ia[31:0]; 
-      memory_unit.data_memory_input = beta.mem_data_output; 
-      memory_unit.xwr = beta.xwr; 
-      memory_unit.waddr = beta.mem_data_address[31:0]; 
-      memory_unit.raddr = beta.mem_data_address[31:0]; 
-    
-      // turn off instruction loading
-      memory_unit.instruction_write_enable = b0;
-      memory_unit.instruction_towrite = 32b0; 
-      
-    
-      // write some values to RAM first, then run the beta 
-      case(code_writer.q){
-          // instruction loading
-          code_writer.INSTRUCTIONLOAD:
-              beta.rst = 1;
-              writer_counter.d = writer_counter.q + 1;
-              memory_unit.instruction_towrite = SAMPLE_CODE[writer_counter.q];
-              memory_unit.instruction_write_enable = b1;
-              memory_unit.ia = writer_counter.q<<2; // pad with two zeroes to make it byte addressable
-              if (writer_counter.q == NUMBER_OF_INSTR){
-                  code_writer.d = code_writer.WAIT; // wait one more clock cycle to allow the last instruction to be loaded before start execution
-               }
+        code_writer.WAIT:
+            beta.rst = 1;
+            code_writer.d = code_writer.RUN;
         
-          code_writer.WAIT:
-              beta.rst = 1;
-              code_writer.d = code_writer.GO;
-          
-        
-          code_writer.GO:
-             code_writer.d = code_writer.GO;
-      
-      }
+        code_writer.RUN:
+            code_writer.d = code_writer.RUN;
+    
+    }
     
   }
 }

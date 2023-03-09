@@ -8,9 +8,8 @@ module beta_cpu (
     output ia[32],
     output mem_data_address[32],
     output mem_data_output[32],
-    output xwr,
-    // for debug, connect it to show any output
-    output debug[32]
+    output xwr
+
   ) {
   
   control_unit control_system(.clk(clk));
@@ -119,7 +118,6 @@ module beta_cpu (
     mem_data_address = alu_system.out;
     xwr = control_system.xwr;
     
-    //for debug 
-    debug = control_system.pcsel;
+
   }
 }
