@@ -64,19 +64,12 @@ module au_top (
     next_button_conditioner.in = io_button[4];
     next_button_edge.in = next_button_conditioner.out;
 
-    if (~next_button.q){
-      next_button.d = next_button_edge.out;
-    }
+    next_button.d = next_button_edge.out;
     
-    // reset next button dff if slowlock_edge is 1 this cycle 
-    if (next_button.q & slowclock_edge.out){
-      next_button.d = 0;
-    }
-
     // driving the beta 
     slowclock_edge.in = slowclock.value[27];
     beta.interrupt = 0;
-    beta.slowclk = slowclock_edge.out & (io_dip[2][7] | next_button.q); // proceed either when next button is pressed or io_dip[2][7] is 1
+    beta.slowclk = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
     beta.rst = rst;
   
     // connect memory unit with beta 
