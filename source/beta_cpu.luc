@@ -20,33 +20,35 @@ module beta_cpu (
 
   always {
   
-   //*****CONTROL unit******// 
+    //*****CONTROL unit******// 
     control_system.reset = rst;
     control_system.irq = interrupt;
     control_system.opcode = instruction[31:26];
     
-   //*****PC unit******// 
-   ia = pc.q; 
-  
+    //*****PC unit******// 
+    ia = pc.q; 
+    
     regfile_system.write_enable = 0;
-   if (slowclk){ 
-      regfile_system.write_enable = control_system.werf;
-   // PCSEL mux 
-   case (control_system.pcsel){
-      b000: 
-        pc.d = pc.q + 4;
-      b001:
-        pc.d = pc.q + 4 + 4 * c{instruction[15], instruction[15:0]};
-      b010:
-        // protect jump
-        pc.d = c{pc.q[31] && regfile_system.read_data_1[31],regfile_system.read_data_1[30:0]};
-      b011:
-        pc.d = h00000008; // illop 
-      b100: 
-        pc.d = h00000004; // irq 
-      default:
-        pc.d = pc.q;
-    }
+
+    // advance the PC only when slowclk is 1 
+    if (slowclk){ 
+        regfile_system.write_enable = control_system.werf;
+      // PCSEL mux 
+      case (control_system.pcsel){
+          b000: 
+            pc.d = pc.q + 4;
+          b001:
+            pc.d = pc.q + 4 + 4 * c{instruction[15], instruction[15:0]};
+          b010:
+            // protect jump
+            pc.d = c{pc.q[31] && regfile_system.read_data_1[31],regfile_system.read_data_1[30:0]};
+          b011:
+            pc.d = h00000008; // illop 
+          b100: 
+            pc.d = h00000004; // irq 
+          default:
+            pc.d = pc.q;
+        }
     }
     
     //reset mux 
