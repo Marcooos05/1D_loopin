@@ -14,6 +14,8 @@
     <src>alu.luc</src>
     <component>simple_ram.v</component>
     <src>shifter.luc</src>
+    <src>seven_seg.luc</src>
+    <src>multi_seven_seg.luc</src>
     <component>reset_conditioner.luc</component>
     <src>boolean.luc</src>
     <component>edge_detector.luc</component>
