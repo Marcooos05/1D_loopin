@@ -2,8 +2,9 @@ module control_unit (
     input clk,
     input irq, 
     input z,
-    input reset,    
+    input rst,    
     input opcode[6],
+    input slowclk,
     output pcsel[3], 
     output wasel,
     output asel,
@@ -108,18 +109,20 @@ module control_unit (
     }
     
     // force wr = 0 when reset == 1 
-    if (reset){
+    if (rst){
       wr = 0;
       werf = 0;
     }
     
     // interrupt checker, will overwrite everything hence we put at the bottom    
-    if (irq_sampler.q == 1){
+    if (irq_sampler.q & slowclk){
       pcsel = b100;
       wasel = 1;
       werf = 1;
       wdsel = b00;
       wr = 0;
+      // clear interrupt bit 
+      irq_sampler.d = 0;
     }
     
     

@@ -2,7 +2,7 @@ module beta_cpu (
     input clk,  // clock
     input slowclk,
     input rst,
-    input interrupt,
+    input irq,
     input instruction[32],
     input mem_data_input[32],
     output ia[32],
@@ -16,7 +16,7 @@ module beta_cpu (
 
   ) {
   
-  control_unit control_system(.clk(clk));
+  control_unit control_system(.clk(clk), .rst(rst));
   alu alu_system;
   regfile_unit regfile_system(.clk(clk), .rst(rst));
   pc_unit pc_system(.clk(clk));
@@ -28,10 +28,10 @@ module beta_cpu (
   always {
   
     //*****CONTROL unit******// 
-    control_system.reset = rst;
-    control_system.irq = interrupt;
+    control_system.irq = irq;
     control_system.opcode = instruction[31:26];
     control_system.z = regfile_system.z;
+    control_system.slowclk = slowclk;
     
     //*****PC unit******// 
     pc_system.rst = rst;

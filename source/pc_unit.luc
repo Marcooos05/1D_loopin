@@ -27,7 +27,7 @@ module pc_unit (
             pcsel_out = pc.q + 4 + 4 * c{id[15], id[15:0]};
           b010:
             // protect JT bit 31
-            pcsel_out = c{pc.q[31] && ra_data[31], ra_data[30:0]};
+            pcsel_out = c{pc.q[31] & ra_data[31], ra_data[30:0]};
           b011:
             pcsel_out = h80000008; // illop 
           b100: 
