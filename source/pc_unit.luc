@@ -1,0 +1,52 @@
+module pc_unit (
+    input clk,  // clock
+    input rst,  // reset
+    input slowclk, // slowclock to advance pc
+    input id[16],
+    input pcsel[3],
+    input ra_data[32],
+    output pc_4[32],
+    output pc_4_sxtc[32],
+    output ia[32]
+  ) {
+
+  dff pc[32](#INIT(0),.clk(clk));
+  sig pcsel_out[32];
+  
+  always {
+    //*****PC unit******// 
+
+    
+    // advance the PC only when slowclk is 1 
+    if (slowclk){ 
+      // PCSEL mux 
+      case (pcsel){
+          b000: 
+            pcsel_out = pc.q + 4;
+          b001:
+            pcsel_out = pc.q + 4 + 4 * c{id[15], id[15:0]};
+          b010:
+            // protect JT bit 31
+            pcsel_out = c{pc.q[31] && ra_data[31], ra_data[30:0]};
+          b011:
+            pcsel_out = h80000008; // illop 
+          b100: 
+            pcsel_out = h80000004; // irq 
+          default:
+            pcsel_out = pc.q;
+        }
+      pc.d = pcsel_out; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if(slowclk) clause
+    }
+    
+    //reset mux 
+    if (rst){
+        pc.d = h80000000; // reset can happen anytime regardless of slowclk
+    }
+    
+    ia = pc.q;
+    pc_4 =  pc.q + 4;
+    pc_4_sxtc = pc.q + 4 + 4 * c{id[15], id[15:0]};
+    
+    
+  }
+}

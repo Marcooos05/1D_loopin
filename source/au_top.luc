@@ -25,8 +25,8 @@ module au_top (
  
   const NUMBER_OF_INSTRUCTION = 5;
   const MEMORY_SIZE = 16;
-  instructionrom instruction_unit(#WORDS(MEMORY_SIZE));
-  memoryunit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 16 * 32 bits 
+  instruction_rom instruction_unit(#WORDS(MEMORY_SIZE));
+  memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 16 * 32 bits 
   
   dff writer_counter[$clog2(NUMBER_OF_INSTRUCTION)](.clk(clk));
   fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, RESET, RUN};

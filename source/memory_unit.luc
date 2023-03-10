@@ -1,5 +1,5 @@
 // supports byte addressable
-module memoryunit #(
+module memory_unit #(
   WORDS = 16 // entries in the memory
 )
 (

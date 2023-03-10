@@ -1,5 +1,6 @@
-module regfile (
+module regfile_memory (
     input clk,  // clock
+    input rst, // reset
     input read_address_1[5],
     input read_address_2[5],
     output read_data_1[32],
@@ -9,7 +10,7 @@ module regfile (
     input write_enable
   ) {
   
-  dff registers[32][32](.clk(clk));
+  dff registers[32][32](.clk(clk), .rst(rst));
   
   always {
     
