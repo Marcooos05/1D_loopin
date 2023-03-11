@@ -161,6 +161,10 @@ module au_top (
       io_led[0] = beta.ia[7:0];
       io_led[1] = beta.ia[15:8];
       seg.values = {beta.ia[15:12], beta.ia[11:8], beta.ia[7:4], beta.ia[3:0]};
+    h0F: // MSB 16 bits of instruction address
+      io_led[0] = beta.ia[31:24];
+      io_led[1] = beta.ia[23:16];
+      seg.values = {beta.ia[31:28], beta.ia[27:24], beta.ia[23:20], beta.ia[19:16]}; 
     h03: // LSB 16 bits of EA (this is also ALU output)
       io_led[0] = beta.mem_data_address[7:0];
       io_led[1] = beta.mem_data_address[15:8];
@@ -204,6 +208,7 @@ module au_top (
     h0D: // The value of beta_output_buffer (16 bits) 
       io_led[1:0] = {beta_output_buffer.q[15:8], beta_output_buffer.q[7:0]};
       seg.values = {beta_output_buffer.q[15:12], beta_output_buffer.q[11:8], beta_output_buffer.q[7:4], beta_output_buffer.q[3:0]};
+
   }
   }
 }

@@ -12,19 +12,24 @@ module pc_unit (
 
   dff pc[32](#INIT(0),.clk(clk));
   sig pcsel_out[32];
+  sig sextc[32];
+  sig pc_4_sxtc_sig[32];
+  sig pc_4_sig[32];
   
   always {
     //*****PC unit******// 
+    pc_4_sig = c{pc.q[31], pc.q[30:0] + 4};            
+    sextc = 4 * c{id[15], id[15:0]};
+    pc_4_sxtc_sig = c{pc.q[31], pc.q[30:0] + 4 + sextc[30:0]};
 
-    
     // advance the PC only when slowclk is 1 
     if (slowclk){ 
       // PCSEL mux 
       case (pcsel){
           b000: 
-            pcsel_out = pc.q + 4;
+            pcsel_out = pc_4_sig;
           b001:
-            pcsel_out = pc.q + 4 + 4 * c{id[15], id[15:0]};
+            pcsel_out = pc_4_sxtc_sig;
           b010:
             // protect JT bit 31
             pcsel_out = c{pc.q[31] & ra_data[31], ra_data[30:0]};
@@ -44,8 +49,8 @@ module pc_unit (
     }
     
     ia = pc.q;
-    pc_4 =  pc.q + 4;
-    pc_4_sxtc = pc.q + 4 + 4 * c{id[15], id[15:0]};
+    pc_4 =  pc_4_sig;
+    pc_4_sxtc = pc_4_sxtc_sig;
     
     
   }
