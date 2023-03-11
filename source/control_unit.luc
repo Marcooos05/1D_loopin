@@ -87,7 +87,10 @@ module control_unit (
 
   always {
   
-    irq_sampler.d = irq;
+    if (~irq_sampler.q){
+      // sample only when interrupt bit is 0 (clear) 
+      irq_sampler.d = irq;
+    }
   
     pcsel = CU_ROM[opcode][16:14]; 
     wasel = CU_ROM[opcode][13]; 

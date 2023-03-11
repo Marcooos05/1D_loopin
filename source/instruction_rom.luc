@@ -7,11 +7,34 @@ module instruction_rom #(
   
    // Driver code, ADDC is the first instruction, BNE is the last
   const INSTRUCTIONS = {
-    32h7823FFFB, // BNE(R3, 0, R1) 
+    32h77FFFFE4, // BR(0)
+    32h649F000C, // ST(R4, 0xC, R31) 
+    32hC09F0001, // ADDC(R31, 1, R4)
+    32h649F000C, // ST(R4, 0xC, R31) 
+    32hC09F0002, // ADDC(R31, 2, R4)
+    32h649F000C, // ST(R4, 0xC, R31) 
+    32hC09F0003, // ADDC(R31, 3, R4)
+    32h649F000C, // ST(R4, 0xC, R31) 
+    32hC09F0004, // ADDC(R31, 4, R4)
+    32h649F000C, // ST(R4, 0xC, R31) --- countdown 5, 4, 3, 2, 1 to be be displayed at beta_output
+    32hC09F0005, // ADDC(R31, 5, R4) --- illop
+    32h77FFFFEF, // BR(0)
+    32h649F000C, // ST(R4, 0xC, R31) 
+    32hC09F0001, // ADDC(R31, 1, R4) 
+    32h649F000C, // ST(R4, 0xC, R31) 
+    32hC09F0002, // ADDC(R31, 2, R4)  
+    32h649F000C, // ST(R4, 0xC, R31) --- countdown 3, 2, 1 to be displayed at beta_output
+    32hC09F0003, // ADDC(R31, 3, R4) --- irq 
+    32h00000100, // LONG(256) --- trigger illop when R3's value is eventually 0 after several loops to main_sub
+    32h7BE3FFFB, // BNE(R3, main_sub, R31) 
     32h607F0020, // LD(R31, 32, R3) 
-    32h643F0020, // ST(R1, 32) 
+    32h643F0020, // ST(R1, 32, R31)
     32h90410800, // CMPEQ(R1, R1, R2) 
-    32hC03F0007 // ADDC(R31, 7, R1)
+    32hC4210001, // SUBC(R1, 1, R1) --- main_sub
+    32hC03F0003, // ADDC(R31, 7, R1) --- main
+    32h77FF0007, // BR(irq)
+    32h77FF000F, // BR(illop)
+    32h77FF0002 // BR(main)
   };
 
   always {

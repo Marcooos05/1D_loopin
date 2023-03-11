@@ -17,19 +17,23 @@ module au_top (
   dff next_button(.clk(clk));
   button_conditioner next_button_conditioner(.clk(clk));
   edge_detector next_button_edge(#RISE(1), #FALL(0), .clk(clk));
+  
+  button_conditioner interrupt_button_conditioner(.clk(clk));
+  edge_detector interrupt_button_edge(#RISE(1), #FALL(0), .clk(clk));
 
   beta_cpu beta(.clk(clk));
   counter slowclock(#SIZE(28), .clk(clk), .rst(rst));
   edge_detector slowclock_edge(#RISE(1), #FALL(0), .clk(clk));
   edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
  
-  const NUMBER_OF_INSTRUCTION = 5;
-  const MEMORY_SIZE = 16;
+  const NUMBER_OF_INSTRUCTION = 28;
+  const MEMORY_SIZE = 32;
   instruction_rom instruction_unit(#WORDS(MEMORY_SIZE));
-  memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 16 * 32 bits 
+  memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 32 * 32 bits 
+  dff beta_output[16](.clk(clk)); // 16 bit beta output register, hardwired to always read memory_unit value at byte address 0xC
   
   dff writer_counter[$clog2(NUMBER_OF_INSTRUCTION)](.clk(clk));
-  fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, RESET, RUN};
+  fsm code_writer(.clk(clk)) = {INSTRUCTIONLOAD, RESET, RUN, LOAD_OUTPUT, DISPLAY_OUTPUT};
   
   multi_seven_seg seg(.clk(clk),.rst(rst));
   reset_conditioner reset_cond(.clk(clk));
@@ -57,7 +61,11 @@ module au_top (
     // driving the beta 
     slowclock_edge.in = slowclock.value[27];
     fastclock_edge.in = slowclock.value[25];
-    beta.irq = io_button[0];
+    
+    // connect hardware interrupt button 
+    interrupt_button_conditioner.in = io_button[0];
+    interrupt_button_edge.in = interrupt_button_conditioner.out;
+    beta.irq = interrupt_button_edge.out;
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
 
@@ -103,7 +111,26 @@ module au_top (
             code_writer.d = code_writer.RUN;
         
         code_writer.RUN:
+            // only load output at the the beginning of each "next" instruction cycle 
+            // LOAD_OUTPUT will hijack EA for 2 cycles. At this point, the CPU is not receiving a legitimate Mem[EA] if it is doing a LD/LDR 
+            // However since "next" is more than 2 cycles, it will be fixed by the third cycle (actual EA coming out from beta is plugged into memory unit
+            if (next){
+                code_writer.d = code_writer.LOAD_OUTPUT;
+            }
+            else{
+                code_writer.d = code_writer.RUN;
+            }
+            
+        
+        code_writer.LOAD_OUTPUT:
+            // load hardcoded byte address hC for output 
+            memory_unit.raddr = 32hC;
+            code_writer.d = code_writer.DISPLAY_OUTPUT;
+        
+        code_writer.DISPLAY_OUTPUT:
+            beta_output.d = memory_unit.data_memory_output;
             code_writer.d = code_writer.RUN;
+      
     
     }
 
@@ -164,7 +191,10 @@ module au_top (
     h0C: // LSB 16 bits of wdsel_out
       io_led[0] = beta.debug_wdsel[7:0];
       io_led[1] = beta.debug_wdsel[15:8];
-      seg.values = {beta.debug_wdsel[15:12], beta.debug_wdsel[11:8], beta.debug_wdsel[7:4], beta.debug_wdsel[3:0]};  
+      seg.values = {beta.debug_wdsel[15:12], beta.debug_wdsel[11:8], beta.debug_wdsel[7:4], beta.debug_wdsel[3:0]};
+    h0D: // The value of beta_output (16 bits) 
+      io_led[1:0] = {beta_output.q[15:8], beta_output.q[7:0]};
+      seg.values = {beta_output.q[15:12], beta_output.q[11:8], beta_output.q[7:4], beta_output.q[3:0]};
   }
   }
 }

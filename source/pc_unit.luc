@@ -29,9 +29,9 @@ module pc_unit (
             // protect JT bit 31
             pcsel_out = c{pc.q[31] & ra_data[31], ra_data[30:0]};
           b011:
-            pcsel_out = h80000008; // illop 
+            pcsel_out = h80000004; // illop 
           b100: 
-            pcsel_out = h80000004; // irq 
+            pcsel_out = h80000008; // irq 
           default:
             pcsel_out = pc.q;
         }
