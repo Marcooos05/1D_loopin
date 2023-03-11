@@ -23,9 +23,9 @@ module regfile_memory (
         registers.d[write_address] = write_data;
     }
     
-    // check if its not R31 
-    if (read_address_1 == b11111) read_data_1 = h0000;
-    if (read_address_2 == b11111) read_data_2 = h0000;
+    // always give out 0 if we are reading R31
+    if (read_address_1 == b11111) read_data_1 = 32h0;
+    if (read_address_2 == b11111) read_data_2 = 32h0;
     
   }
 }
