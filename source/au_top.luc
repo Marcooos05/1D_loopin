@@ -69,7 +69,7 @@ module au_top (
     // connect hardware interrupt button 
     interrupt_button_conditioner.in = io_button[0];
     interrupt_button_edge.in = interrupt_button_conditioner.out;
-    irq = interrupt_button_edge.out;
+    beta.irq = interrupt_button_edge.out;
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
 
@@ -142,10 +142,10 @@ module au_top (
   io_seg = ~seg.seg;
   io_sel = ~seg.sel;
   
-  debug_pcsel = beta.debug[0]
-  debug_asel = beta.debug[1]
-  debug_bsel = beta.debug[1]
-  debug_wdsel = beta.debug[1]
+  debug_pcsel = beta.debug[0];
+  debug_asel = beta.debug[1];
+  debug_bsel = beta.debug[1];
+  debug_wdsel = beta.debug[1];
 
 // debugger
   case (io_dip[0]){
