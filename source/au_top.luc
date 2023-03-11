@@ -11,6 +11,7 @@ module au_top (
     input io_dip [3][8]     // DIP switches on IO Shield
   ) {
   
+  // helper signals
   sig rst;                  // reset signal
   sig next;                 // next instruction signal
   sig debug_pcsel[16];
@@ -18,35 +19,46 @@ module au_top (
   sig debug_bsel[16];
   sig debug_wdsel[16];
 
+  // Beta CPU
+  beta_cpu beta(.clk(clk));
+
+  // manual next button to advance one instruction
   dff next_button(.clk(clk));
   button_conditioner next_button_conditioner(.clk(clk));
   edge_detector next_button_edge(#RISE(1), #FALL(0), .clk(clk));
   
+  // interrupt button conditioners, edge detector, and input buffer
   button_conditioner interrupt_button_conditioner[3](.clk(clk));
   edge_detector interrupt_button_edge[3](#RISE(1), #FALL(0), .clk(clk));
-  dff beta_input_buffer[32](.clk(clk), .rst(rst)); // 32 bit beta input buffer, hardwired to always write memory_unit value at byte address 0x10
 
-  beta_cpu beta(.clk(clk));
+  // to run beta at slower clock than FPGA clock
   counter slowclock(#SIZE(28), .clk(clk), .rst(rst));
   edge_detector slowclock_edge(#RISE(1), #FALL(0), .clk(clk));
   edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
  
+  // setup and instantiate memory unit and instruction ROM
   const NUMBER_OF_INSTRUCTION = 27;
   const MEMORY_SIZE = 32;
   instruction_rom instruction_unit(#WORDS(MEMORY_SIZE));
   memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 32 * 32 bits 
-  dff beta_output_buffer[32](.clk(clk), .rst(rst)); // 32 bit beta output buffer, hardwired to always read memory_unit value at byte address 0xC
   
+  // MOTHERBOARD 
+  // prepare output buffer
+  dff beta_output_buffer[32](.clk(clk), .rst(rst)); // 32 bit beta output buffer, hardwired to always read memory_unit value at byte address 0xC
+  // prepare input buffer
+  dff beta_input_buffer[32](.clk(clk), .rst(rst)); // 32 bit beta input buffer, hardwired to always write memory_unit value at byte address 0x10
+  // counter to write instructions from ROM to instruction memory
   dff writer_counter[$clog2(NUMBER_OF_INSTRUCTION)](.clk(clk));
   fsm motherboard(.clk(clk)) = {INSTRUCTIONLOAD, RESET, RUN, LOAD_OUTPUT, DISPLAY_OUTPUT, UPDATE_INPUT};
   
+  // OTHERS (for debug)
   multi_seven_seg seg(.clk(clk),.rst(rst));
   reset_conditioner reset_cond(.clk(clk));
   
   always {
     reset_cond.in = ~rst_n;   // input raw inverted reset signal
     rst = reset_cond.out;     // conditioned reset
-    io_led = 3x{{h00}};
+    io_led = 3x{{h00}};       // turn all LED off at first
     usb_tx = usb_rx;          // loop serial port
     io_seg = 8hff; // connect segments to the driver
     io_sel = 4hf; // connect digit select to the driver
@@ -107,8 +119,7 @@ module au_top (
     memory_unit.instruction_write_enable = b0;
     memory_unit.instruction_towrite = 32b0; 
     
-  
-    // write some values to RAM first, then run the beta 
+    // Load ROM instructions to RAM first, then run the Beta 
     case(motherboard.q){
         // instruction loading
         motherboard.INSTRUCTIONLOAD:
@@ -117,7 +128,7 @@ module au_top (
             instruction_unit.addr = writer_counter.q;
             memory_unit.instruction_towrite = instruction_unit.out;
             memory_unit.instruction_write_enable = b1;
-            memory_unit.ia = writer_counter.q<<2; // pad with two zeroes to make it byte addressable
+            memory_unit.ia = writer_counter.q<<2; // pad with two zeroes to make it byte addressable because memory_unit expects byte addresing ia
             if (writer_counter.q == NUMBER_OF_INSTRUCTION){
                 motherboard.d = motherboard.RESET; // wait one more clock cycle to allow the last instruction to be loaded before start execution
               }

@@ -6,14 +6,14 @@ module memory_unit #(
     input clk,  // clock
     
     // for data memory
-    input raddr[$clog2(WORDS)+2], // receives byte addressing, hence must expand by 2 bits as beta is giving byte address (more bits needed)
-    input waddr[$clog2(WORDS)+2],
+    input raddr[$clog2(WORDS)+2], // byte addressing expected
+    input waddr[$clog2(WORDS)+2], // byte addressing expected
     input data_memory_input[32],
     input wr,
     output data_memory_output[32],
             
     // for instruction memory 
-    input ia[$clog2(WORDS)+2],
+    input ia[$clog2(WORDS)+2], // byte addressing expected
     input instruction_write_enable,
     input instruction_towrite[32],
     output instruction[32]

@@ -38,7 +38,7 @@ module beta_cpu (
     pc_system.id = instruction[15:0];
     ia = pc_system.ia;
      
-    //***** REGFILE *****//
+    //***** REGFILE unit *****//
     regfile_system.slowclk = slowclk;
     regfile_system.ra2sel = control_system.ra2sel;
     regfile_system.wasel = control_system.wasel;
@@ -48,7 +48,7 @@ module beta_cpu (
     regfile_system.rc = instruction[25:21];
 
     
-    //******ALU*******//
+    //****** ALU + WDSEL unit *******//
     // ASEL mux
     alu_system.alufn_signal = control_system.alufn;
     case(control_system.asel){
@@ -84,7 +84,7 @@ module beta_cpu (
         wdsel_out = alu_system.out;
     } 
     
-    
+    // connect output of beta_cpu module
     alu_system.a = asel_out;
     alu_system.b = bsel_out; 
     regfile_system.wdsel_out = wdsel_out;
