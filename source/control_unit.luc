@@ -117,7 +117,8 @@ module control_unit (
       werf = 0;
     }
     
-    // interrupt checker, will overwrite everything hence we put at the bottom    
+    // interrupt checker, will overwrite everything hence we put at the bottom  
+    // caveat: since Beta Lucid will always run in Kernel mode, interrupt can happen anytime   
     if (irq_sampler.q & slowclk){
       pcsel = b100;
       wasel = 1;
