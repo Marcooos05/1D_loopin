@@ -30,7 +30,7 @@ module au_top (
   edge_detector slowclock_edge(#RISE(1), #FALL(0), .clk(clk));
   edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
  
-  const NUMBER_OF_INSTRUCTION = 28;
+  const NUMBER_OF_INSTRUCTION = 31;
   const MEMORY_SIZE = 32;
   instruction_rom instruction_unit(#WORDS(MEMORY_SIZE));
   memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 32 * 32 bits 
@@ -124,7 +124,6 @@ module au_top (
             else{
                 motherboard.d = motherboard.RUN;
             }
-            
         
         motherboard.LOAD_OUTPUT:
             // load hardcoded byte address hC for output 
