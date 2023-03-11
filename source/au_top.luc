@@ -13,6 +13,10 @@ module au_top (
   
   sig rst;                  // reset signal
   sig next;                 // next instruction signal
+  sig debug_pcsel[16];
+  sig debug_asel[16];
+  sig debug_bsel[16];
+  sig debug_wdsel[16];
 
   dff next_button(.clk(clk));
   button_conditioner next_button_conditioner(.clk(clk));
@@ -65,7 +69,7 @@ module au_top (
     // connect hardware interrupt button 
     interrupt_button_conditioner.in = io_button[0];
     interrupt_button_edge.in = interrupt_button_conditioner.out;
-    beta.irq = interrupt_button_edge.out;
+    irq = interrupt_button_edge.out;
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
 
@@ -137,7 +141,12 @@ module au_top (
   seg.values = {4b0,4b0,4b0,4b0};
   io_seg = ~seg.seg;
   io_sel = ~seg.sel;
-    
+  
+  debug_pcsel = beta.debug[0]
+  debug_asel = beta.debug[1]
+  debug_bsel = beta.debug[1]
+  debug_wdsel = beta.debug[1]
+
 // debugger
   case (io_dip[0]){
     h00: // MSB 16 bits of current instruction
@@ -177,21 +186,21 @@ module au_top (
       io_led[1] = beta.mem_data_output[31:24];
       seg.values = {beta.mem_data_output[31:28], beta.mem_data_output[27:24], beta.mem_data_output[23:20], beta.mem_data_output[19:16]};
     h09: // LSB 16 bits of pcsel_out
-      io_led[0] = beta.debug_pcsel[7:0];
-      io_led[1] = beta.debug_pcsel[15:8];
-      seg.values = {beta.debug_pcsel[15:12], beta.debug_pcsel[11:8], beta.debug_pcsel[7:4], beta.debug_pcsel[3:0]};
+      io_led[0] = debug_pcsel[7:0];
+      io_led[1] = debug_pcsel[15:8];
+      seg.values = {debug_pcsel[15:12], debug_pcsel[11:8], debug_pcsel[7:4], debug_pcsel[3:0]};
     h0A: // LSB 16 bits of asel_out
-      io_led[0] = beta.debug_asel[7:0];
-      io_led[1] = beta.debug_asel[15:8];
-      seg.values = {beta.debug_asel[15:12], beta.debug_asel[11:8], beta.debug_asel[7:4], beta.debug_asel[3:0]};
+      io_led[0] = debug_asel[7:0];
+      io_led[1] = debug_asel[15:8];
+      seg.values = {debug_asel[15:12], debug_asel[11:8], debug_asel[7:4], debug_asel[3:0]};
     h0B: // LSB 16 bits of bsel_out
-      io_led[0] = beta.debug_bsel[7:0];
-      io_led[1] = beta.debug_bsel[15:8];
-      seg.values = {beta.debug_bsel[15:12], beta.debug_bsel[11:8], beta.debug_bsel[7:4], beta.debug_bsel[3:0]};
+      io_led[0] = debug_bsel[7:0];
+      io_led[1] = debug_bsel[15:8];
+      seg.values = {debug_bsel[15:12], debug_bsel[11:8], debug_bsel[7:4], debug_bsel[3:0]};
     h0C: // LSB 16 bits of wdsel_out
-      io_led[0] = beta.debug_wdsel[7:0];
-      io_led[1] = beta.debug_wdsel[15:8];
-      seg.values = {beta.debug_wdsel[15:12], beta.debug_wdsel[11:8], beta.debug_wdsel[7:4], beta.debug_wdsel[3:0]};
+      io_led[0] = debug_wdsel[7:0];
+      io_led[1] = debug_wdsel[15:8];
+      seg.values = {debug_wdsel[15:12], debug_wdsel[11:8], debug_wdsel[7:4], debug_wdsel[3:0]};
     h0D: // The value of beta_output_buffer (16 bits) 
       io_led[1:0] = {beta_output_buffer.q[15:8], beta_output_buffer.q[7:0]};
       seg.values = {beta_output_buffer.q[15:12], beta_output_buffer.q[11:8], beta_output_buffer.q[7:4], beta_output_buffer.q[3:0]};
