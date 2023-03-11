@@ -20,11 +20,11 @@ module instruction_rom #(
     32hC09F0005, // ADDC(R31, 5, R4) --- illop
     32h77FFFFEF, // BR(0)
     32h649F000C, // ST(R4, 0xC, R31) 
-    32hC09F0001, // ADDC(R31, 1, R4) 
+    32hC09F0006, // ADDC(R31, 1, R4) 
     32h649F000C, // ST(R4, 0xC, R31) 
-    32hC09F0002, // ADDC(R31, 2, R4)  
-    32h649F000C, // ST(R4, 0xC, R31) --- countdown 3, 2, 1 to be displayed at beta_output
-    32hC09F0003, // ADDC(R31, 3, R4) --- irq 
+    32hC09F0007, // ADDC(R31, 2, R4)  
+    32h649F000C, // ST(R4, 0xC, R31) --- countdown 8, 7, 6 to be displayed at beta_output
+    32hC09F0008, // ADDC(R31, 3, R4) --- irq 
     32h00000100, // LONG(256) --- trigger illop when R3's value is eventually 0 after several loops to main_sub
     32h7BE3FFFB, // BNE(R3, main_sub, R31) 
     32h607F0020, // LD(R31, 32, R3) 
