@@ -4,7 +4,7 @@ This repository contains the source code that implements 32-bit Beta CPU in Luci
 
 ### Instruction Data
 
-Currently, only 5 instructions are hardcoded inside `instructionrom.luc`. These instructions are designed to _loop_ to make it easier to demonstrate the workings of the Beta CPU. You may change the content of this instruction rom to load any Beta CPU instruction.
+Currently, only 28 instructions are hardcoded inside `instructionrom.luc`. These instructions are designed to _loop_ to make it easier to demonstrate the workings of the Beta CPU. You may change the content of this instruction rom to load any Beta CPU instruction.
 
 Please change `const NUMBER_OF_INSTRUCTION` in `au_top.luc` to match your custom instruction.
 
@@ -35,3 +35,5 @@ Once flashed, you may set the following to run the Beta:
 11. `0xA`: LSB 16 bits of asel_out
 12. `0xB`: LSB 16 bits of bsel_out
 13. `0xC`: LSB 16 bits of wdsel_out
+14. `0xC`: LSB 16 bits of beta output buffer. This is a dff that's hardwired to reflect Mem[0xC]
+15. `0xD`: MSB 16 bits of instruction address. Useful to see PC31 (mode)
