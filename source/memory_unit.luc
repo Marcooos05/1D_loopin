@@ -8,15 +8,15 @@ module memory_unit #(
     // for data memory
     input raddr[$clog2(WORDS)+2], // byte addressing expected
     input waddr[$clog2(WORDS)+2], // byte addressing expected
-    input data_memory_input[32],
-    input wr,
+    input wd[32], // write data
+    input we,
     output data_memory_output[32],
             
     // for instruction memory 
     input ia[$clog2(WORDS)+2], // byte addressing expected
     input instruction_write_enable,
     input instruction_towrite[32],
-    output instruction[32]
+    output id[32]
 
   ) {
 
@@ -25,16 +25,18 @@ module memory_unit #(
  
   
   always {
-      
+
+    // instruction memory connections
     instruction_memory.write_data = instruction_towrite;
     instruction_memory.address = ia[$clog2(WORDS)+2-1:2]; // memory_unit is word addressable in Lucid, ignore two LSB
     instruction_memory.write_en = instruction_write_enable;
-    instruction = instruction_memory.read_data;
+    id = instruction_memory.read_data;
     
+    // data memory connections
     data_memory.raddr = raddr[$clog2(WORDS)+2-1:2]; // memory_unit is word addressable in Lucid, ignore two LSB
     data_memory.waddr = waddr[$clog2(WORDS)+2-1:2]; // memory_unit is word addressable in Lucid, ignore two LSB
-    data_memory.write_data = data_memory_input;
-    data_memory.write_en = wr;
+    data_memory.write_data = wd;
+    data_memory.write_en = we;
     data_memory_output = data_memory.read_data;
           
     
