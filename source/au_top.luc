@@ -37,7 +37,6 @@ module au_top (
   edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
  
   // setup and instantiate memory unit and instruction ROM
-  const NUMBER_OF_INSTRUCTIONS = 32;
   const MEMORY_SIZE = 32;
   instruction_rom instruction_unit(#WORDS(MEMORY_SIZE));
   memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 32 * 32 bits 
@@ -129,7 +128,7 @@ module au_top (
             memory_unit.instruction_towrite = instruction_unit.out;
             memory_unit.instruction_write_enable = b1;
             memory_unit.ia = writer_counter.q<<2; // pad with two zeroes to make it byte addressable because memory_unit expects byte addresing ia
-            if (writer_counter.q == NUMBER_OF_INSTRUCTIONS){
+            if ((writer_counter.q + 1) == MEMORY_SIZE){
                 motherboard.d = motherboard.RESET; // wait one more clock cycle to allow the last instruction to be loaded before start execution
               }
       
