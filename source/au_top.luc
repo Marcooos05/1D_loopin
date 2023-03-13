@@ -108,7 +108,7 @@ module au_top (
   
     // connect memory unit with beta 
     beta.instruction = memory_unit.id;
-    beta.mem_data_input = memory_unit.data_memory_output;
+    beta.mem_data_input = memory_unit.mrd;
     memory_unit.ia = beta.ia[31:0]; 
     memory_unit.wd = beta.mem_data_output; 
     memory_unit.we = beta.wr; 
@@ -157,7 +157,7 @@ module au_top (
         
         motherboard.DISPLAY_OUTPUT:
             // display Mem[12] to beta_output_buffer for user to see
-            beta_output_buffer.d = memory_unit.data_memory_output;
+            beta_output_buffer.d = memory_unit.mrd;
             motherboard.d = motherboard.UPDATE_INPUT;
         
         motherboard.UPDATE_INPUT:
@@ -205,13 +205,13 @@ module au_top (
       io_led[1] = beta.mem_data_address[31:24];
       seg.values = {beta.mem_data_address[31:28], beta.mem_data_address[27:24], beta.mem_data_address[23:20], beta.mem_data_address[19:16]}; 
     h05: // LSB 16 bits of Mem[EA]
-      io_led[0] = memory_unit.data_memory_output[7:0];
-      io_led[1] = memory_unit.data_memory_output[15:8];
-      seg.values = {memory_unit.data_memory_output[15:12], memory_unit.data_memory_output[11:8], memory_unit.data_memory_output[7:4], memory_unit.data_memory_output[3:0]}; 
+      io_led[0] = memory_unit.mrd[7:0];
+      io_led[1] = memory_unit.mrd[15:8];
+      seg.values = {memory_unit.mrd[15:12], memory_unit.mrd[11:8], memory_unit.mrd[7:4], memory_unit.mrd[3:0]}; 
     h06: // MSB 16 bits of Mem[EA]
-      io_led[0] = memory_unit.data_memory_output[23:16];
-      io_led[1] = memory_unit.data_memory_output[31:24];
-      seg.values = {memory_unit.data_memory_output[31:28], memory_unit.data_memory_output[27:24], memory_unit.data_memory_output[23:20], memory_unit.data_memory_output[19:16]}; 
+      io_led[0] = memory_unit.mrd[23:16];
+      io_led[1] = memory_unit.mrd[31:24];
+      seg.values = {memory_unit.mrd[31:28], memory_unit.mrd[27:24], memory_unit.mrd[23:20], memory_unit.mrd[19:16]}; 
     h07: // LSB 16 bits of RD2 (mwd[15:0]) 
       io_led[0] = beta.mem_data_output[7:0];
       io_led[1] = beta.mem_data_output[15:8];
