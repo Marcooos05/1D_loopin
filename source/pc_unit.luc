@@ -10,15 +10,19 @@ module pc_unit (
     output ia[32]
   ) {
 
-  dff pc[32](#INIT(0),.clk(clk));
+  dff pc[32](#INIT(0),.clk(clk)); // PC Register
+
   sig pcsel_out[32];
   sig sextc[32];
   sig pc_4_sxtc_sig[32];
   sig pc_4_sig[32];
   
   always {
-    //*****PC unit******// 
+
+    // increment pc by 4
     pc_4_sig = c{pc.q[31], pc.q[30:0] + 4};            
+    
+    // shift-and-add pc by 4
     sextc = 4 * c{id[15], id[15:0]};
     pc_4_sxtc_sig = c{pc.q[31], pc.q[30:0] + 4 + sextc[30:0]};
 
@@ -31,7 +35,7 @@ module pc_unit (
           b001:
             pcsel_out = pc_4_sxtc_sig;
           b010:
-            // protect JT bit 31
+            // JMP mux to protect JT31
             pcsel_out = c{pc.q[31] & ra_data[31], ra_data[30:0]};
           b011:
             pcsel_out = h80000004; // illop 
@@ -40,10 +44,10 @@ module pc_unit (
           default:
             pcsel_out = pc.q;
         }
-      pc.d = pcsel_out; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if(slowclk) clause
+      pc.d = c{pcsel_out[31:2], b00}; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if(slowclk) clause
     }
     
-    //reset mux 
+    // RESET mux 
     if (rst){
         pc.d = h80000000; // reset can happen anytime regardless of slowclk
     }
