@@ -37,9 +37,9 @@ The debug signals spans from `io_led[1:0]` and also the 7 segment.
 11. `0xA`: LSB 16 bits of asel_out
 12. `0xB`: LSB 16 bits of bsel_out
 13. `0xC`: LSB 16 bits of wdsel_out
-14. `0xD`: LSB 16 bits of beta output buffer. This is a dff that's hardwired to reflect Mem[0xC]
+14. `0xD`: MSB 16 bits of instruction address. Useful to see PC31 (kernel/user mode)
 15. `0xE`: LSB 16 bits of beta input buffer. This is a dff that's hardwired to reflect Mem[0x10]
-16. `0xF`: MSB 16 bits of instruction address. Useful to see PC31 (kernel/user mode)
+16. `0xF`: LSB 16 bits of beta output buffer. This is a dff that's hardwired to reflect Mem[0xC]
 
 ### Interrupt button
 

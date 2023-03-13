@@ -101,10 +101,6 @@ module au_top (
       io_led[0] = motherboard.ia[7:0];
       io_led[1] = motherboard.ia[15:8];
       seg.values = {motherboard.ia[15:12], motherboard.ia[11:8], motherboard.ia[7:4], motherboard.ia[3:0]};
-    h0F: // MSB 16 bits of instruction address
-      io_led[0] = motherboard.ia[31:24];
-      io_led[1] = motherboard.ia[23:16];
-      seg.values = {motherboard.ia[31:28], motherboard.ia[27:24], motherboard.ia[23:20], motherboard.ia[19:16]}; 
     h03: // LSB 16 bits of EA (this is also ALU output)
       io_led[0] = motherboard.ma[7:0];
       io_led[1] = motherboard.ma[15:8];
@@ -145,12 +141,16 @@ module au_top (
       io_led[0] = debug_wdsel[7:0];
       io_led[1] = debug_wdsel[15:8];
       seg.values = {debug_wdsel[15:12], debug_wdsel[11:8], debug_wdsel[7:4], debug_wdsel[3:0]};
-    h0D: // LSB 16 bits of beta_output_buffer 
-      io_led[1:0] = {motherboard.output_buffer[15:8], motherboard.output_buffer[7:0]};
-      seg.values = {motherboard.output_buffer[15:12], motherboard.output_buffer[11:8], motherboard.output_buffer[7:4],motherboard.output_buffer[3:0]}; 
-    h0E: // LSB 16 bits of beta_input_buffer
+    h0D: // MSB 16 bits of instruction address
+      io_led[0] = motherboard.ia[31:24];
+      io_led[1] = motherboard.ia[23:16];
+      seg.values = {motherboard.ia[31:28], motherboard.ia[27:24], motherboard.ia[23:20], motherboard.ia[19:16]}; 
+    h0E: // LSB 16 bits of system_input_buffer 
       io_led[1:0] = {motherboard.input_buffer[15:8], motherboard.input_buffer[7:0]};
       seg.values = {motherboard.input_buffer[15:12], motherboard.input_buffer[11:8], motherboard.input_buffer[7:4], motherboard.input_buffer[3:0]}; 
+    h0F: // LSB 16 bits of system_output_buffer 
+      io_led[1:0] = {motherboard.output_buffer[15:8], motherboard.output_buffer[7:0]};
+      seg.values = {motherboard.output_buffer[15:12], motherboard.output_buffer[11:8], motherboard.output_buffer[7:4],motherboard.output_buffer[3:0]}; 
   }
   }
 }
