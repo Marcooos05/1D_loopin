@@ -52,6 +52,7 @@ module pc_unit (
         pc.d = h80000000; // reset can happen anytime regardless of slowclk
     }
     
+    // output connections
     ia = pc.q;
     pc_4 =  pc_4_sig;
     pc_4_sxtc = pc_4_sxtc_sig;

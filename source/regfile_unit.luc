@@ -48,12 +48,16 @@ module regfile_unit (
         wasel_out = rc;
     }
     
+    // connections to regfile memory
     regfile.read_address_2 = ra2sel_out;
     regfile.read_address_1 = ra;
     regfile.write_address = wasel_out;
     regfile.write_data = wdsel_out;
-    
+
+    // compute z 
     z = ~|regfile.reg_data_1;
+
+    // output connections
     reg_data_1 = regfile.reg_data_1; 
     mwd = regfile.reg_data_2;
     reg_data_2 = regfile.reg_data_2;

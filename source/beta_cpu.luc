@@ -84,7 +84,7 @@ module beta_cpu (
         wdsel_out = alu_system.out;
     } 
     
-    // connect output of beta_cpu module
+    // output connections 
     alu_system.a = asel_out;
     alu_system.b = bsel_out; 
     regfile_system.wdsel_out = wdsel_out;
