@@ -38,7 +38,6 @@ module memory_unit #(
     data_memory.write_data = wd;
     data_memory.write_en = we;
     mrd = data_memory.read_data;
-          
     
   }
 }

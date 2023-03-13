@@ -18,7 +18,9 @@ Once flashed, you may set the following to run the Beta:
 2. io_dip[2][6]: toggles between slow (0) or faster clock (1)
 3. `button[4]`: this is the "right" button on Io Element Board. Press this to advance by 1 instruction when you're in **manual** mode
 
-### Output Signals
+### Debug Signals
+
+The debug signals spans from `io_led[1:0]` and also the 7 segment.
 
 `io_dip[0]` can be changed to "view" various states presented at `io_led[1]` and `io_led[0]` (16 bits of values at once). Simply set it to represent the values below, e.g: `0x3` means that `io_dip[0]` is set to `00000011` (turn the rightmost two switches on). Here are the exhaustive list:
 
@@ -38,3 +40,20 @@ Once flashed, you may set the following to run the Beta:
 14. `0xD`: LSB 16 bits of beta output buffer. This is a dff that's hardwired to reflect Mem[0xC]
 15. `0xE`: LSB 16 bits of beta input buffer. This is a dff that's hardwired to reflect Mem[0x10]
 16. `0xF`: MSB 16 bits of instruction address. Useful to see PC31 (kernel/user mode)
+
+### Interrupt button
+
+`button[2:0]` can be pressed at anytime and it will trigger an interrupt signal. You can observe that the button press is eventually "captured" by the Beta and stored in `Mem[0x10]`. You can set `io_dip[0] = 0xD` to view this result at the 7 segment.
+
+### Reset button
+
+If you press Alchitry Au reset button, it will reset the Beta to its original state (`PC` set to `0x80000000`)
+
+### Additional Signals
+
+There are 4 additional signals indicated in `io_led[2][7:4]`.
+
+1. `io_led[2][7]`: auto mode is ON or OFF
+2. `io_led[2][6]`: `fastclock` is ON or OFF
+3. `io_led[2][5]`: signifies `slowclock` signal
+4. `io_led[2][4]`: signifies `fastclock` signal
