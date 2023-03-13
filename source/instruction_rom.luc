@@ -33,7 +33,7 @@ module instruction_rom #(
     32hC03F0003, // 0x00C ADDC(R31, 7, R1) --- main
     32h77FF0007, // 0x008 BR(irq)
     32h77FF000C, // 0x004 BR(illop)
-    32h77FF0019  // 0x000  BR(reset)
+    32h77FF0019  // 0x000 BR(reset)
   };
 
   always {

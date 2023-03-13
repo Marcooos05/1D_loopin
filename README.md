@@ -6,7 +6,7 @@ This repository contains the source code that implements 32-bit Beta CPU in Luci
 
 Currently, only 27 instructions are hardcoded inside `instruction_rom.luc`. These instructions are designed to _loop_ to make it easier to demonstrate the workings of the Beta CPU. You may change the content of this instruction rom to load any Beta CPU instruction.
 
-Please change `const NUMBER_OF_INSTRUCTION` in `au_top.luc` to match your custom instruction.
+Please change `const MEMORY_SIZE` in `au_top.luc` to match your custom instruction.
 
 ### Running the Beta
 
