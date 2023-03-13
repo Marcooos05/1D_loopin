@@ -13,7 +13,8 @@ module regfile_memory (
   dff registers[32][32](.clk(clk), .rst(rst));
   
   always {
-    
+
+    // TASK 7 
     //always read 
     reg_data_1 = registers.q[read_address_1];
     reg_data_2 = registers.q[read_address_2];

@@ -22,12 +22,14 @@ module pc_unit (
     // increment pc by 4
     pc_4_sig = c{pc.q[31], pc.q[30:0] + 4};            
     
+    // TASK 4
     // shift-and-add pc by 4
     sextc = 4 * c{id[15], id[15:0]};
     pc_4_sxtc_sig = c{pc.q[31], pc.q[30:0] + 4 + sextc[30:0]};
 
     // advance the PC only when slowclk is 1 
-    if (slowclk){ 
+    if (slowclk){
+      // TASK 1 
       // PCSEL mux 
       case (pcsel){
           b000: 
@@ -47,6 +49,7 @@ module pc_unit (
       pc.d = c{pcsel_out[31:2], b00}; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if(slowclk) clause
     }
     
+    // Task 2
     // RESET mux 
     if (rst){
         pc.d = h80000000; // reset can happen anytime regardless of slowclk

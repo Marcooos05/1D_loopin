@@ -23,7 +23,8 @@ module beta_cpu (
   sig wdsel_out[32];
 
   always {
-  
+
+    // Task 12
     //***** CONTROL unit ******// 
     control_system.irq = irq;
     control_system.ia31 = pc_system.ia[31];
@@ -37,7 +38,6 @@ module beta_cpu (
     pc_system.reg_data_1 = regfile_system.reg_data_1;
     pc_system.pcsel = control_system.pcsel;
     pc_system.id = instruction[15:0];
-    ia = pc_system.ia;
      
     //***** REGFILE unit *****//
     regfile_system.slowclk = slowclk;
@@ -48,7 +48,6 @@ module beta_cpu (
     regfile_system.rb = instruction[15:11];
     regfile_system.rc = instruction[25:21];
 
-    
     //****** ALU + WDSEL unit *******//
     // ASEL mux
     alu_system.alufn_signal = control_system.alufn;
@@ -72,7 +71,6 @@ module beta_cpu (
         bsel_out = regfile_system.reg_data_2;
     }
 
-    
     // WDSEL mux
     case(control_system.wdsel){
       b00:
@@ -85,15 +83,18 @@ module beta_cpu (
         wdsel_out = alu_system.out;
     } 
     
-    // output connections 
+    // connect asel, bsel, alu, and wdsel
     alu_system.a = asel_out;
     alu_system.b = bsel_out; 
     regfile_system.wdsel_out = wdsel_out;
+
+    // output connections
+    ia = pc_system.ia;
     mem_data_address = alu_system.out;
     mem_data_output = regfile_system.mwd;
     wr = control_system.wr;
 
-    // debug values
+    // debug signals
     debug[0][15:0] = pc_system.pc_4_sxtc[15:0];
     debug[1][15:0] = asel_out[15:0];
     debug[2][15:0] = bsel_out[15:0];

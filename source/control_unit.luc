@@ -105,25 +105,19 @@ module control_unit (
     werf= CU_ROM[opcode][1];
     wr = CU_ROM[opcode][0]; 
     
-    
-    // branch check (BNE and BEQ handling) 
+    // Task 10
+    // PCSEL for BNE/BEQ
     if (opcode == b011101 && z == 1){ // BEQ, branch if z == 1
       pcsel = b001;
     }
     else if (opcode == b011110 && z == 0){ // BNE, branch if z != 1
       pcsel = b001;
     }
-    
-    // force wr = 0 when reset == 1 
-    if (rst){
-      wr = 0;
-    }
-    
+  
+    // Task 11
     // IRQ handling
     // IRQ can happen only in user mode (ia31 is 0)
-    // if IRQ happens during kernel mode, it will be handled first
-    // IRQ will still fire the moment we return to user mode
-    // Will overwrite everything hence we put at the bottom  
+    // If IRQ happens during kernel mode, it will not be serviced until we return to user mode
     if (irq_sampler.q & slowclk & ~ia31){
       pcsel = b100;
       wasel = 1;
@@ -134,7 +128,10 @@ module control_unit (
       irq_sampler.d = 0;
     }
     
-    
+    // force wr = 0 when reset == 1 
+    if (rst){
+      wr = 0;
+    }
 
   }
 }
