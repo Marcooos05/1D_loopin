@@ -10,7 +10,7 @@ module regfile_unit (
     input wdsel_out[32],
     input slowclk,
     output z,
-    output read_data_1[32],
+    output reg_data_1[32],
     output read_data_2[32],
     output mwd[32]
   ) {
@@ -53,8 +53,8 @@ module regfile_unit (
     regfile.write_address = wasel_out;
     regfile.write_data = wdsel_out;
     
-    z = ~|regfile.read_data_1;
-    read_data_1 = regfile.read_data_1; 
+    z = ~|regfile.reg_data_1;
+    reg_data_1 = regfile.reg_data_1; 
     mwd = regfile.read_data_2;
     read_data_2 = regfile.read_data_2;
 

@@ -33,7 +33,7 @@ module beta_cpu (
     //*****PC unit******// 
     pc_system.rst = rst;
     pc_system.slowclk = slowclk;
-    pc_system.ra_data = regfile_system.read_data_1;
+    pc_system.reg_data_1 = regfile_system.reg_data_1;
     pc_system.pcsel = control_system.pcsel;
     pc_system.id = instruction[15:0];
     ia = pc_system.ia;
@@ -53,11 +53,11 @@ module beta_cpu (
     alu_system.alufn_signal = control_system.alufn;
     case(control_system.asel){
       b0:
-        asel_out = regfile_system.read_data_1;
+        asel_out = regfile_system.reg_data_1;
       b1:
         asel_out = pc_system.pc_4_sxtc;
       default:
-        asel_out = regfile_system.read_data_1;
+        asel_out = regfile_system.reg_data_1;
     }
 
     // BSEL mux

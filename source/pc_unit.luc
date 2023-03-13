@@ -4,7 +4,7 @@ module pc_unit (
     input slowclk, // slowclock to advance pc
     input id[16],
     input pcsel[3],
-    input ra_data[32],
+    input reg_data_1[32],
     output pc_4[32],
     output pc_4_sxtc[32],
     output ia[32]
@@ -36,7 +36,7 @@ module pc_unit (
             pcsel_out = pc_4_sxtc_sig;
           b010:
             // JMP mux to protect JT31
-            pcsel_out = c{pc.q[31] & ra_data[31], ra_data[30:0]};
+            pcsel_out = c{pc.q[31] & reg_data_1[31], reg_data_1[30:0]};
           b011:
             pcsel_out = h80000004; // illop 
           b100: 
