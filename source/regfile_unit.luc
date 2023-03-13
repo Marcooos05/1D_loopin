@@ -11,7 +11,7 @@ module regfile_unit (
     input slowclk,
     output z,
     output reg_data_1[32],
-    output read_data_2[32],
+    output reg_data_2[32],
     output mwd[32]
   ) {
   
@@ -55,8 +55,8 @@ module regfile_unit (
     
     z = ~|regfile.reg_data_1;
     reg_data_1 = regfile.reg_data_1; 
-    mwd = regfile.read_data_2;
-    read_data_2 = regfile.read_data_2;
+    mwd = regfile.reg_data_2;
+    reg_data_2 = regfile.reg_data_2;
 
   }
 }
