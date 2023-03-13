@@ -26,6 +26,7 @@ module beta_cpu (
   
     //*****CONTROL unit******// 
     control_system.irq = irq;
+    control_system.ia31 = pc_system.ia[31];
     control_system.opcode = instruction[31:26];
     control_system.z = regfile_system.z;
     control_system.slowclk = slowclk;
