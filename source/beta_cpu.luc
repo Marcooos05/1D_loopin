@@ -95,7 +95,7 @@ module beta_cpu (
     wr = control_system.wr;
 
     // debug signals
-    debug[0][15:0] = pc_system.pc_4_sxtc[15:0];
+    debug[0][15:0] = pc_system.pcsel_out[15:0];
     debug[1][15:0] = asel_out[15:0];
     debug[2][15:0] = bsel_out[15:0];
     debug[3][15:0] = wdsel_out[15:0];
