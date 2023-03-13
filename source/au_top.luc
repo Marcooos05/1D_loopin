@@ -32,7 +32,7 @@ module au_top (
   edge_detector interrupt_button_edge[3](#RISE(1), #FALL(0), .clk(clk));
 
   // to run beta at slower clock than FPGA clock
-  counter slowclock(#SIZE(28), .clk(clk), .rst(rst));
+  counter frequency_divider(#SIZE(28), .clk(clk), .rst(rst));
   edge_detector slowclock_edge(#RISE(1), #FALL(0), .clk(clk));
   edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
  
@@ -66,8 +66,8 @@ module au_top (
     led = c{3b0, io_button};  // connect buttons to LEDs
     io_led[2][7] = io_dip[2][7]; // see toggle manual/auto mode
     io_led[2][6] = io_dip[2][6]; // see toggle fastclock 
-    io_led[2][5] = slowclock.value[27]; // see slowclock
-    io_led[2][4] = slowclock.value[25]; // see fastclock 
+    io_led[2][5] = frequency_divider.value[27]; 
+    io_led[2][4] = frequency_divider.value[25];  
     
     // next button
     next_button_conditioner.in = io_button[4];
@@ -75,8 +75,8 @@ module au_top (
     next_button.d = next_button_edge.out;
     
     // driving the beta 
-    slowclock_edge.in = slowclock.value[27];
-    fastclock_edge.in = slowclock.value[25];
+    slowclock_edge.in = frequency_divider.value[27];
+    fastclock_edge.in = frequency_divider.value[25];
     
     // connect hardware interrupt button 
     interrupt_button_conditioner.in = io_button[2:0];
