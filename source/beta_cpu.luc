@@ -24,14 +24,14 @@ module beta_cpu (
 
   always {
   
-    //*****CONTROL unit******// 
+    //***** CONTROL unit ******// 
     control_system.irq = irq;
     control_system.ia31 = pc_system.ia[31];
     control_system.opcode = instruction[31:26];
     control_system.z = regfile_system.z;
     control_system.slowclk = slowclk;
     
-    //*****PC unit******// 
+    //***** PC unit ******// 
     pc_system.rst = rst;
     pc_system.slowclk = slowclk;
     pc_system.reg_data_1 = regfile_system.reg_data_1;
@@ -56,7 +56,7 @@ module beta_cpu (
       b0:
         asel_out = regfile_system.reg_data_1;
       b1:
-        asel_out = pc_system.pc_4_sxtc;
+        asel_out = c{0, pc_system.pc_4_sxtc[30:0]}; // supervisor bit is ignored in LDR
       default:
         asel_out = regfile_system.reg_data_1;
     }
@@ -76,7 +76,7 @@ module beta_cpu (
     // WDSEL mux
     case(control_system.wdsel){
       b00:
-        wdsel_out = pc_system.pc_4;
+        wdsel_out = pc_system.pc_4; // Supervisor bit is already protected in pc_unit
       b01: 
         wdsel_out = alu_system.out;
       b10:
