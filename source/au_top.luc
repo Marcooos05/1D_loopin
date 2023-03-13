@@ -37,7 +37,7 @@ module au_top (
   edge_detector fastclock_edge(#RISE(1), #FALL(0), .clk(clk)); 
  
   // setup and instantiate memory unit and instruction ROM
-  const NUMBER_OF_INSTRUCTIONS = 27;
+  const NUMBER_OF_INSTRUCTIONS = 32;
   const MEMORY_SIZE = 32;
   instruction_rom instruction_unit(#WORDS(MEMORY_SIZE));
   memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); // can fit 32 * 32 bits 
