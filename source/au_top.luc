@@ -107,11 +107,11 @@ module au_top (
     beta.rst = rst;
   
     // connect memory unit with beta 
-    beta.instruction = memory_unit.instruction;
+    beta.instruction = memory_unit.id;
     beta.mem_data_input = memory_unit.data_memory_output;
     memory_unit.ia = beta.ia[31:0]; 
-    memory_unit.data_memory_input = beta.mem_data_output; 
-    memory_unit.wr = beta.wr; 
+    memory_unit.wd = beta.mem_data_output; 
+    memory_unit.we = beta.wr; 
     memory_unit.waddr = beta.mem_data_address[31:0]; 
     memory_unit.raddr = beta.mem_data_address[31:0]; 
   
@@ -164,8 +164,8 @@ module au_top (
             // always store hardcoded byte address 32h10 (16) for any incoming input each time "next" happens
             // need 2x original clock cycles for data to be readable at 32h10, plenty of time since "next" is more than 2 cycles
             memory_unit.waddr = 32h10;
-            memory_unit.data_memory_input = beta_input_buffer.q;
-            memory_unit.wr = 1;
+            memory_unit.wd = beta_input_buffer.q;
+            memory_unit.we = 1;
             motherboard.d = motherboard.RUN;
     }
 
@@ -181,13 +181,13 @@ module au_top (
 
   case (io_dip[0]){
     h00: // MSB 16 bits of current instruction
-      io_led[0] = memory_unit.instruction[23:16];
-      io_led[1] = memory_unit.instruction[31:24];
-      seg.values = {memory_unit.instruction[31:28], memory_unit.instruction[27:24], memory_unit.instruction[23:20], memory_unit.instruction[19:16]};
+      io_led[0] = memory_unit.id[23:16];
+      io_led[1] = memory_unit.id[31:24];
+      seg.values = {memory_unit.id[31:28], memory_unit.id[27:24], memory_unit.id[23:20], memory_unit.id[19:16]};
     h01: // LSB 16 bits of current instruction
-      io_led[0] = memory_unit.instruction[7:0];
-      io_led[1] = memory_unit.instruction[15:8];
-      seg.values = {memory_unit.instruction[15:12], memory_unit.instruction[11:8], memory_unit.instruction[7:4], memory_unit.instruction[3:0]}; 
+      io_led[0] = memory_unit.id[7:0];
+      io_led[1] = memory_unit.id[15:8];
+      seg.values = {memory_unit.id[15:12], memory_unit.id[11:8], memory_unit.id[7:4], memory_unit.id[3:0]}; 
     h02: // LSB 16 bits of instruction address
       io_led[0] = beta.ia[7:0];
       io_led[1] = beta.ia[15:8];
