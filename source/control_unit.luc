@@ -114,7 +114,6 @@ module control_unit (
     // force wr = 0 when reset == 1 
     if (rst){
       wr = 0;
-      werf = 0;
     }
     
     // interrupt checker, will overwrite everything hence we put at the bottom  

@@ -10,7 +10,7 @@ module regfile_memory (
     input write_enable
   ) {
   
-  dff registers[32][32](.clk(clk), .rst(rst));
+  dff registers[32][32](#INIT(0),.clk(clk), .rst(rst));
   
   always {
     
