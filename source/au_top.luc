@@ -89,31 +89,31 @@ module au_top (
   debug_wdsel = motherboard.debug[1];
 
   case (io_dip[0]){
-    h00: // MSB 16 bits of current instruction
+    h00: // MSB 16 bits of current instruction (id[31:16])
       io_led[0] = motherboard.id[23:16];
       io_led[1] = motherboard.id[31:24];
       seg.values = {motherboard.id[31:28], motherboard.id[27:24], motherboard.id[23:20], motherboard.id[19:16]};
-    h01: // LSB 16 bits of current instruction
+    h01: // LSB 16 bits of current instruction (id[15:0])
       io_led[0] = motherboard.id[7:0];
       io_led[1] = motherboard.id[15:8];
       seg.values = {motherboard.id[15:12], motherboard.id[11:8], motherboard.id[7:4], motherboard.id[3:0]}; 
-    h02: // LSB 16 bits of instruction address
+    h02: // LSB 16 bits of instruction address (ia[15:0])
       io_led[0] = motherboard.ia[7:0];
       io_led[1] = motherboard.ia[15:8];
       seg.values = {motherboard.ia[15:12], motherboard.ia[11:8], motherboard.ia[7:4], motherboard.ia[3:0]};
-    h03: // LSB 16 bits of EA (this is also ALU output)
+    h03: // LSB 16 bits of EA (this is also ALU output) (ma[15:0])
       io_led[0] = motherboard.ma[7:0];
       io_led[1] = motherboard.ma[15:8];
       seg.values = {motherboard.ma[15:12], motherboard.ma[11:8],motherboard.ma[7:4], motherboard.ma[3:0]};
-    h04: // MSB 16 bits of EA (this is also ALU output)
+    h04: // MSB 16 bits of EA (this is also ALU output) (ma[31:16])
       io_led[0] = motherboard.ma[23:16];
       io_led[1] = motherboard.ma[31:24];
       seg.values = {motherboard.ma[31:28], motherboard.ma[27:24], motherboard.ma[23:20], motherboard.ma[19:16]}; 
-    h05: // LSB 16 bits of Mem[EA]
+    h05: // LSB 16 bits of Mem[EA] (mrd[15:0])
       io_led[0] = motherboard.mrd[7:0];
       io_led[1] = motherboard.mrd[15:8];
       seg.values = {motherboard.mrd[15:12], motherboard.mrd[11:8], motherboard.mrd[7:4], motherboard.mrd[3:0]}; 
-    h06: // MSB 16 bits of Mem[EA]
+    h06: // MSB 16 bits of Mem[EA] (mrd[31:16])
       io_led[0] = motherboard.mrd[23:16];
       io_led[1] = motherboard.mrd[31:24];
       seg.values = {motherboard.mrd[31:28], motherboard.mrd[27:24], motherboard.mrd[23:20], motherboard.mrd[19:16]}; 
@@ -141,7 +141,7 @@ module au_top (
       io_led[0] = debug_wdsel[7:0];
       io_led[1] = debug_wdsel[15:8];
       seg.values = {debug_wdsel[15:12], debug_wdsel[11:8], debug_wdsel[7:4], debug_wdsel[3:0]};
-    h0D: // MSB 16 bits of instruction address
+    h0D: // MSB 16 bits of instruction address. Useful to see PC31 (kernel/user mode) (ia[31:16])
       io_led[0] = motherboard.ia[31:24];
       io_led[1] = motherboard.ia[23:16];
       seg.values = {motherboard.ia[31:28], motherboard.ia[27:24], motherboard.ia[23:20], motherboard.ia[19:16]}; 
