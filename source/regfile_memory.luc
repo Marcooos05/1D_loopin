@@ -3,8 +3,8 @@ module regfile_memory (
     input rst, // reset
     input read_address_1[5],
     input read_address_2[5],
-    output read_data_1[32],
-    output read_data_2[32],
+    output reg_data_1[32],
+    output reg_data_2[32],
     input write_address[5],
     input write_data[32],
     input write_enable
@@ -15,8 +15,8 @@ module regfile_memory (
   always {
     
     //always read 
-    read_data_1 = registers.q[read_address_1];
-    read_data_2 = registers.q[read_address_2];
+    reg_data_1 = registers.q[read_address_1];
+    reg_data_2 = registers.q[read_address_2];
     
     // check if write_en and its not R31 
     if (write_address != b11111 && write_enable){
@@ -24,8 +24,8 @@ module regfile_memory (
     }
     
     // always give out 0 if we are reading R31
-    if (read_address_1 == b11111) read_data_1 = 32h0;
-    if (read_address_2 == b11111) read_data_2 = 32h0;
+    if (read_address_1 == b11111) reg_data_1 = 32h0;
+    if (read_address_2 == b11111) reg_data_2 = 32h0;
     
   }
 }

@@ -63,12 +63,12 @@ module beta_cpu (
     // BSEL mux
     case(control_system.bsel){
       b0:
-        bsel_out = regfile_system.read_data_2;
+        bsel_out = regfile_system.reg_data_2;
       b1:
         bsel_out = c{instruction[15], instruction[15:0]};
         
       default:
-        bsel_out = regfile_system.read_data_2;
+        bsel_out = regfile_system.reg_data_2;
     }
 
     
