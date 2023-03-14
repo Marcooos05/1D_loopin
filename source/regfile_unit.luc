@@ -61,10 +61,11 @@ module regfile_unit (
 
     // output connections
     reg_data_1 = regfile.reg_data_1; 
+    reg_data_2 = regfile.reg_data_2;
+    
     // TASK 9
     // connect output of RD2 port of regfile_memory as mwd
     mwd = regfile.reg_data_2;
-    reg_data_2 = regfile.reg_data_2;
 
   }
 }

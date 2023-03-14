@@ -7,7 +7,7 @@ module instruction_rom #(
   
    // Driver code, BR(reset) is the first instruction
   const INSTRUCTIONS = {
-    32h6FE50000, // 0x06C JML(R5)
+    32h6FE50000, // 0x06C JMP(R5)
     32hC0BF000C, // 0x068 ADDC(R31, 12, R5) --- reset handler, go to main in user mode 
     32h6FE50000, // 0x064 JMP(R5)
     32hC0BF000C, // 0x060 ADDC(R31, 12, R5) 
@@ -31,7 +31,7 @@ module instruction_rom #(
     32h643F0020, // 0x018 ST(R1, 32, R31)
     32h90410800, // 0x014 CMPEQ(R1, R1, R2) 
     32hC4210001, // 0x010 SUBC(R1, 1, R1) --- main_sub
-    32hC03F0003, // 0x00C ADDC(R31, 7, R1) --- main
+    32hC03F0003, // 0x00C ADDC(R31, 3, R1) --- main
     32h77FF0007, // 0x008 BR(irq)
     32h77FF000C, // 0x004 BR(illop)
     32h77FF0019  // 0x000 BR(reset)

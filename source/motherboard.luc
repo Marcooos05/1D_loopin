@@ -25,6 +25,7 @@ module motherboard (
   dff system_output_buffer[32](.clk(clk), .rst(rst)); // 32 bit beta output buffer, hardwired to always read memory_unit value at byte address 0xC
   // prepare input buffer
   dff system_input_buffer[32](.clk(clk), .rst(rst)); // 32 bit beta input buffer, hardwired to always write memory_unit value at byte address 0x10
+  
   // counter to write instructions from ROM to instruction memory
   dff writer_counter[$clog2(MEMORY_SIZE)](.clk(clk));
   fsm motherboard(.clk(clk)) = {INSTRUCTIONLOAD, RUN, LOAD_OUTPUT, DISPLAY_OUTPUT, UPDATE_INPUT};

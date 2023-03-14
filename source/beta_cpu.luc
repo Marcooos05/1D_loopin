@@ -16,7 +16,7 @@ module beta_cpu (
   control_unit control_system(.clk(clk), .rst(rst));
   alu alu_system;
   regfile_unit regfile_system(.clk(clk), .rst(rst));
-  pc_unit pc_system(.clk(clk));
+  pc_unit pc_system(.clk(clk), .rst(rst));
 
   sig asel_out[32];
   sig bsel_out[32];
@@ -33,7 +33,6 @@ module beta_cpu (
     control_system.slowclk = slowclk;
     
     //***** PC unit ******// 
-    pc_system.rst = rst;
     pc_system.slowclk = slowclk;
     pc_system.reg_data_1 = regfile_system.reg_data_1;
     pc_system.pcsel = control_system.pcsel;
