@@ -28,11 +28,9 @@ module pc_unit (
     sextc = 4 * c{id[15], id[15:0]};
     pc_4_sxtc_sig = c{pc.q[31], pc.q[30:0] + 4 + sextc[30:0]};
 
-    // advance the PC only when slowclk is 1 
-    if (slowclk){
-      // TASK 1 
-      // PCSEL mux 
-      case (pcsel){
+    // TASK 1 
+    // PCSEL mux 
+    case (pcsel){
           b000: 
             pcsel_out_sig = pc_4_sig;
           b001:
@@ -46,7 +44,10 @@ module pc_unit (
             pcsel_out_sig = h80000008; // irq 
           default:
             pcsel_out_sig = pc.q;
-        }
+     }
+    
+    // advance the PC only when slowclk is 1 
+    if (slowclk){
       pc.d = c{pcsel_out_sig[31:2], b00}; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if(slowclk) clause
     }
     
