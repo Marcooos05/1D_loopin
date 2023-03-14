@@ -25,7 +25,7 @@ module pc_unit (
     
     // TASK 4
     // shift-and-add pc by 4
-    pc_4_sxtc_32_sig = pc.q + 4 + 4 * c{id[15], id[15:0]};
+    pc_4_sxtc_32_sig = pc.q + 4 + (4 * c{16x{id[15]}, id[15:0]});
     pc_4_sxtc_sig = c{pc.q[31], pc_4_sxtc_32_sig[30:0]};
 
     // TASK 1 
