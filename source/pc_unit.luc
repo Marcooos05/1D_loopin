@@ -14,7 +14,7 @@ module pc_unit (
   dff pc[32](#INIT(0),.clk(clk)); // PC Register
 
   sig pcsel_out_sig[32];
-  sig sextc[32];
+  sig 4_sxtc_sig[32];
   sig pc_4_sxtc_sig[32];
   sig pc_4_sig[32];
   
@@ -25,8 +25,8 @@ module pc_unit (
     
     // TASK 4
     // shift-and-add pc by 4
-    sextc = 4 * c{id[15], id[15:0]};
-    pc_4_sxtc_sig = c{pc.q[31], pc.q[30:0] + 4 + sextc[30:0]};
+    4_sxtc_sig = pc.q + 4 + 4 * c{id[15], id[15:0]};
+    pc_4_sxtc_sig = c{pc.q[31], 4_sxtc_sig[30:0]};
 
     // TASK 1 
     // PCSEL mux 
