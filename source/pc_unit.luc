@@ -31,24 +31,24 @@ module pc_unit (
     // TASK 1 
     // PCSEL mux 
     case (pcsel){
-          b000: 
-            pcsel_out_sig = pc_4_sig;
-          b001:
-            pcsel_out_sig = pc_4_sxtc_sig;
-          b010:
-            // JMP mux to protect JT31
-            pcsel_out_sig = c{pc.q[31] & reg_data_1[31], reg_data_1[30:0]};
-          b011:
-            pcsel_out_sig = h80000004; // illop 
-          b100: 
-            pcsel_out_sig = h80000008; // irq 
-          default:
-            pcsel_out_sig = pc.q;
+      b000: 
+        pcsel_out_sig = pc_4_sig;
+      b001:
+        pcsel_out_sig = pc_4_sxtc_sig;
+      b010:
+        // JMP mux to protect JT31
+        pcsel_out_sig = c{pc.q[31] & reg_data_1[31], reg_data_1[30:0]};
+      b011:
+        pcsel_out_sig = h80000004; // illop 
+      b100: 
+        pcsel_out_sig = h80000008; // irq 
+      default:
+        pcsel_out_sig = pc.q;
      }
     
     // advance the PC only when slowclk is 1 
     if (slowclk){
-      pc.d = c{pcsel_out_sig[31:2], b00}; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if(slowclk) clause
+      pc.d = c{pcsel_out_sig[31:2], b00}; // setting of pcreg content must happen only when slowclk == 1, don't bring this outside of if (slowclk) clause
     }
     
     // Task 2
