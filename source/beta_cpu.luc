@@ -64,7 +64,7 @@ module beta_cpu (
       b0:
         bsel_out = regfile_system.reg_data_2;
       b1:
-        bsel_out = c{instruction[15], instruction[15:0]};
+        bsel_out = c{16x{instruction[15]}, instruction[15:0]};
         
       default:
         bsel_out = regfile_system.reg_data_2;
