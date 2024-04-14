@@ -235,6 +235,7 @@ module motherboard (
                   h0F:temp_encoding.d = c{42x{b000}, 3x{b011}, 3x{b000}};
                   h10:temp_encoding.d = c{45x{b000}, 3x{b011}};
                   
+                  hF0:temp_encoding.d = 48x{b010};
                   hF1:temp_encoding.d = 48x{b100};
                   hF2:temp_encoding.d = 48x{b101};
                   hF3:temp_encoding.d = 48x{b110};

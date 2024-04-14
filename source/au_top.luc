@@ -88,10 +88,10 @@ module au_top (
     interrupt_button_conditioner.in = io_button[3:0];
     interrupt_button_edge.in = interrupt_button_conditioner.out;
     
-    if (motherboard.r4_location == h0 || motherboard.r4_location == hF1 || motherboard.r4_location == hF2 || motherboard.r4_location == hF3 || motherboard.r4_location ==hF4){
-        motherboard.irq = 0;
+    if (motherboard.r4_location == h01 || motherboard.r4_location == h02 || motherboard.r4_location == h03 || motherboard.r4_location == h04 || motherboard.r4_location ==h05 || motherboard.r4_location == h06 || motherboard.r4_location == h07 || motherboard.r4_location == h08 || motherboard.r4_location == h09 || motherboard.r4_location ==h0A || motherboard.r4_location == h0B || motherboard.r4_location == h0C || motherboard.r4_location == h0D || motherboard.r4_location == h0E || motherboard.r4_location == h0F || motherboard.r4_location == h10){
+        motherboard.irq = interrupt_button_edge.out; // IRQ as long as any of the player buttons[3:0] is pressed
     } else {
-        motherboard.irq = interrupt_button_edge.out; // IRQ as long as any of of the buttons[2:0] is pressed
+        motherboard.irq = 0;
     }
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
