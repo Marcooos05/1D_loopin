@@ -51,7 +51,7 @@ module regfile_memory (
     registers.d[5hA] = r10_data;
     registers.d[5hB] = r11_data;
     
-    if (r12_data_rise == 1 && registers.q[5hC] == 0){ // when p4 button is pressed and the reg file is empty, then reg 17 will hold 1 
+    if (r12_data_rise == 1 && registers.q[5hC] == 0){ // when start button is pressed and the reg file is empty, then reg 12 will hold 1 
         registers.d[5hC] = 32h1; 
     }
     if (r8_data_rise == 1 && registers.q[5hE] == 0){ // when p1 button is pressed and the reg file is empty, then reg 14 will hold 1 

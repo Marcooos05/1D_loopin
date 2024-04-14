@@ -91,7 +91,7 @@ module au_top (
     if (motherboard.r4_location == h0 || motherboard.r4_location == hF1 || motherboard.r4_location == hF2 || motherboard.r4_location == hF3 || motherboard.r4_location ==hF4){
         motherboard.irq = 0;
     } else {
-    motherboard.irq = interrupt_button_edge.out; // IRQ as long as any of of the buttons[2:0] is pressed
+        motherboard.irq = interrupt_button_edge.out; // IRQ as long as any of of the buttons[2:0] is pressed
     }
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
