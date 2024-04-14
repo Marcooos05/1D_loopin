@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="beta-32-complete" board="Alchitry Au" language="Lucid" version="3">
+<project name="beta-32-document" board="Alchitry Au" language="Lucid" version="3">
   <files>
     <src top="true">au_top.luc</src>
     <src>pc_unit.luc</src>
