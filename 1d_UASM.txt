@@ -42,9 +42,13 @@ JMP(R30)							|| Return to PC+4 before branching
 
 || IDLE ||
 idle: 
-CMPEQ(R13, R19, R20)						|| check if counter = counter max, store result in R20
-BNE(R20, update_location, R30)					|| update location when R20 = 1
+BNE(R14, p1_button_press, R30)					|| ##NEW check if p1 pressed
+BNE(R15, p2_button_press, R30)					|| ##NEW check if p2 pressed
+BNE(R16, p3_button_press, R30)					|| ##NEW check if p3 pressed
+BNE(R17, p4_button_press, R30)					|| ##NEW check if p4 pressed
 ADDC(R13, 1, R13)						|| add one to counter
+CMPEQ(R13, R19, R20)						|| check if counter = counter max, store result in R20
+BNE(R20, update_location, R31)					|| update location when R20 = 1
 BEQ(R31, idle, R31)						|| Loop back to idle
 
 || UPDATE LOCATION ||
@@ -78,7 +82,7 @@ BNE(R21, location_update_tens, R30)				|| Update rounds
 
 ||Check player input
 BEQ(R0, idle, R31)			 			|| Branch to idle if P1 life == 0 
-BEQ(R14, subtract_p1_life, R31) 				|| Branch to subtract if button was not press
+BEQ(R14, subtract_p1_life, R30) 				|| Branch to subtract if button was not press
 ADDC(R31, 0, R14) 						|| Reset P1 button press
 BEQ(R31, idle, R31)			 			|| Branch back to idle
 
@@ -89,58 +93,78 @@ JMP(R30)							|| Return to next instruction before the branch
 
 location_5: 
 BEQ(R1, idle, R31)			 			|| Branch to idle if no lives
-BEQ(R15, subtract_p2_life, R31) 				|| Subtract life if no button press
+BEQ(R15, subtract_p2_life, R30) 				|| Subtract life if no button press
 ADDC(R31, 0, R15) 						|| Reset P2 button press
 BEQ(R31, idle, R31)			 			|| Branch back to idle
 
 location_9: 
 BEQ(R2, idle, R31)			 			|| Branch to idle if no lives
-BEQ(R16, subtract_p3_life, R31) 				|| Subtract life if no button press
+BEQ(R16, subtract_p3_life, R30) 				|| Subtract life if no button press
 ADDC(R31, 0, R16) 						|| Reset P3 button press
 BEQ(R31, idle, R31)			 			|| Branch back to idle
 
 location_13: 
 BEQ(R3, idle, R31)			 			|| Branch to idle if no lives
-BEQ(R17, subtract_p4_life, R31)					|| Subtract life if no button press
+BEQ(R17, subtract_p4_life, R30)					|| Subtract life if no button press
 ADDC(R31, 0, R17) 						|| Reset P4 button press
 BEQ(R31, idle, R31)			 			|| Branch back to idle
 
 || BUTTON PRESS EVENT ||
-p1_button_press: BEQ(R0, idle, R31)					|| Branch to idle if no lives
-CMPEQC(R4, 4, R20)							|| Check if location = 4
-BNE(R20, idle, R31)							|| Branch back to idle if button press at right time
+return_p1:
+JMP(R30)							|| return to previous running line
+
+p1_button_press: 
+BEQ(R0, return_p1, R31)						|| Branch to previous running line if no lives
+CMPEQC(R4, 16, R20)						|| Check if location = 16
+BNE(R20, return_p1, R31)					|| Branch back to previous running line if button press at right time
 
 subtract_p1_life: 
 SUBC(R0, 1, R0)							|| Reduce P1 life by 1
+ADDC(R31, 0, R14) 						|| Reset P1 button press
 BEQ(R0, decrease_player_count, R31)				|| If P1 no lives left, branch to decrease player count
-BEQ(R31, idle, R31)						|| Branch back to idle
+BEQ(R31, return_p1, R31)					|| Branch back to previous running line
 
-p2_button_press: BEQ(R1, idle, R31)					|| Branch to idle if no lives
-CMPEQC(R4, 8, R20)							|| Check if location = 8
-BNE(R20, idle, R31)							|| Branch back to idle if button press at right time
+return_p2:
+JMP(R30)							|| return to previous running line
+
+p2_button_press: 
+BEQ(R1, return_p2, R31)						|| Branch to previous running line if no lives
+CMPEQC(R4, 4, R20)						|| Check if location = 4
+BNE(R20, return_p2, R31)					|| Branch back to previous running line if button press at right time
 
 subtract_p2_life: 
 SUBC(R1, 1, R1)							|| Reduce life by 1
+ADDC(R31, 0, R15) 						|| Reset P2 button press
 BEQ(R1, decrease_player_count, R31)				|| If P2 no lives left, branch to decrease player count
-BEQ(R31, idle, R31)						|| Branch back to idle
+BEQ(R31, return_p2, R31)					|| Branch back to previous running line
 
-p3_button_press: BEQ(R2, idle, R31)					|| Branch to idle if no lives
-CMPEQC(R4, 12, R20)							|| Check if location = 12
-BNE(R20, idle, R31)							|| Branch back to idle if button press at right time
+return_p3:	
+JMP(R30)							|| return to previous running line
+
+p3_button_press: 
+BEQ(R2, return_p3, R31)						|| Branch to previous running line if no lives
+CMPEQC(R4, 8, R20)						|| Check if location = 8
+BNE(R20, return_p3, R31)					|| Branch back to previous running line if button press at right time
 
 subtract_p3_life: 
 SUBC(R2, 1, R2)							|| Reduce life by 1
+ADDC(R31, 0, R16) 						|| Reset P3 button press
 BEQ(R2, decrease_player_count, R31)				|| If P3 no lives left, branch to decrease player count
-BEQ(R31, idle, R31)						|| Branch back to idle
+BEQ(R31, return_p3, R31)					|| Branch back to previous running line
 
-p4_button_press: BEQ(R3, idle, R31)					|| Branch to idle if no lives
-CMPEQC(R4, 16, R20)							|| Check if location = 16
-BNE(R20, idle, R31)							|| Branch back to idle if button press at right time
+return_p4:
+JMP(R30)							|| return to previous running line
+
+p4_button_press: 
+BEQ(R3, return_p4, R31)						|| Branch to previous running line if no lives
+CMPEQC(R4, 12, R20)						|| Check if location = 12
+BNE(R20, return_p4, R31)						|| Branch back to previous running line if button press at right time
 
 subtract_p4_life: 
 SUBC(R3, 1, R3)							|| Reduce life by 1
+ADDC(R31, 0, R17) 						|| Reset P4 button press
 BEQ(R3, decrease_player_count, R31)				|| If P4 no lives left, branch to decrease player count
-BEQ(R31, idle, R31)						|| Branch back to idle
+BEQ(R31, return_p4, R31)					|| Branch back to previous running line
 
 decrease_player_count: 
 SUBC(R7, 1, R7)							|| Reduce player count by 1
@@ -225,20 +249,14 @@ BNE(R12, reset, R31)						|| Wait for reset
 BEQ(R31, end_game_loop, R31)					|| Loop back if no action
 
 || IRQ HANDLER, KERNEL PROGRAM ||
-irq: ADDC(R31, 320, R20)						|| p1_button_press at h140 = d320
-JMP(R20)									|| Jump to p1_button_press if p1 is pressed
-ADDC(R31, 344, R20)							|| p2_button_press at h158 = d344
-JMP(R20)									|| Jump to p2_button_press if p2 is pressed
-ADDC(R31, 368, R20)							|| p3_button_press at h170 = d368
-JMP(R20)									|| Jump to p3_button_press if p3 is pressed
-ADDC(R31, 392, R20)							|| p4_button_press at h188 = d392
-JMP(R20)									|| Jump to p4_button_press if p4 is pressed
-ADDC(R31, 108, R20)							|| idle is at h06C = b108
-JMP(R20)									|| Jump to idle
+irq: 
+ADDC(R31, 12, R20)						|| start at h00C = d12
+JMP(R20)							|| Jump back to start
 
 || ILLOP HANDLER, KERNEL PROGRAM ||
-illop: ADDC(R31, 108, R20)						|| idle is at h06C = d108
-JMP(R20)									|| Jump back to idle
+illop: 
+ADDC(R31, 12, R20)						|| start at h00C = d12
+JMP(R20)							|| Jump back to start
 
 || RESET HANDLER, KERNEL PROGRAM ||
 reset: 
