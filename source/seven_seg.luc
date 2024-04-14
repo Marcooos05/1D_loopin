@@ -20,7 +20,7 @@ module seven_seg (
       4hC: segs = 7b0111001;
       4hD: segs = 7b1011110;
       4hE: segs = 7b1111001;
-      4hF: segs = 7b1110001;
+      4hF: segs = 7b1110011; //convert F value og 7b1110001 to P to represent player for winning condition.
       default: segs = 7b0000000;
     }
   }

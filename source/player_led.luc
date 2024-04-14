@@ -1,0 +1,82 @@
+module player_led #(
+    PIXELS = 1 : PIXELS > 0 //DIGITS represent the number of 7 seg to control
+)(
+    input clk,  // clock
+    input rst,  // reset
+    input fall,
+    input rise,
+    input colorbit[3],
+    input live[4],
+    output out
+  ) {
+  const ENCODING_AMOUNT = 8; // how many different encodings are used? 
+  
+  // ORANGE (111), SKY BLUE (110), PURPLE (101), YELLOW (100), BLUE (011), RED (010), GREEN (001), WHITE (000)
+  const LEDCOLOR = {24h00FF9A, 24hFF00FF, 24hFFFF00, 24h00FFFF, 24hFF0000, 24h00FF00, 24h0000FF, 24hFFFFFF}; 
+  
+  sig encoded_pixel_address[$clog2(PIXELS)*$clog2(ENCODING_AMOUNT)];
+  sig current_color_encoding[$clog2(ENCODING_AMOUNT)];
+  
+  var index;
+  
+  dff led_encoding[PIXELS*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(0)); // 2 bit to encode a color per pixel
+  dff temp_encoding[PIXELS*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(b010)); // holds temporary value (double buffering)
+  
+  ws2812b_writer led(#PIXEL_COUNT(PIXELS), .clk(clk), .rst(rst)); 
+  fsm led_state(.clk(clk), .rst(rst)) = {INIT, LOAD, IDLE};
+  .clk(clk) {
+    // The reset conditioner is used to synchronize the reset signal to the FPGA
+    // clock. This ensures the entire FPGA comes out of reset at the same time.
+    //reset_conditioner reset_cond;
+    counter delay(.rst(rst), #DIV(25));
+  }
+  always {
+    led.update = 0;
+    led.clear = 0;
+    
+    case (led_state.q){
+      led_state.IDLE:
+      if (live  != 0){
+             if (rise){
+                 temp_encoding.d = colorbit;
+                 led_state.d = led_state.LOAD;
+              } 
+              if(fall) {
+                led.clear = 1;
+              }
+        } else {
+              if (led_encoding.q != b010){
+              temp_encoding.d = b010;
+              led_state.d = led_state.LOAD;
+            }
+        }
+      
+      led_state.INIT: 
+           if (led.reset & delay.value){ //  you need to artificially introduce some delay before sending data to the LED strip
+               led_state.d = led_state.LOAD;
+           }
+        
+      led_state.LOAD:
+            // wait until we are at RESET state before we decide to refresh the screen
+            if (led.reset){
+                // tell the LED to update the pixels
+                led.update = 1;
+                led_encoding.d = temp_encoding.q;
+                led_state.d = led_state.IDLE;
+                
+            }
+    }
+    
+    
+    // get current color encoding for this pixel
+    encoded_pixel_address = led.pixel_address * $clog2(ENCODING_AMOUNT);
+    for (index=0; index<$clog2(ENCODING_AMOUNT); index++){
+       current_color_encoding[index] = led_encoding.q[encoded_pixel_address+index];
+    }
+    
+    // based on the encoding extracted from dff led_encoding, we get the 24bit color value
+    //led_encode_p1 = led_encoding_p1.q;
+    led.color = LEDCOLOR[current_color_encoding]; 
+    out = led.led;
+  }
+}

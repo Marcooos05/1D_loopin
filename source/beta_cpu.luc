@@ -9,7 +9,24 @@ module beta_cpu (
     output mem_data_address[32],
     output mem_data_output[32],
     output wr,
-    output debug[4][16]
+    output debug[4][16],
+    output r0_p1_live[32],
+    output r1_p2_live[32],
+    output r2_p3_live[32],
+    output r3_p4_live[32],
+    output r4_location[32],
+    output r5_rounds_ones[32],
+    output r6_rounds_tens[32],
+    output r18_change_loc[32],
+    input r8_p1_button,
+    input r9_p2_button,
+    input r10_p3_button,
+    input r11_p4_button,
+    input r8_p1_button_rise,
+    input r9_p2_button_rise,
+    input r10_p3_button_rise,
+    input r11_p4_button_rise,
+    input r12_start_button_rise
 
   ) {
   
@@ -46,7 +63,27 @@ module beta_cpu (
     regfile_system.ra = instruction[20:16];
     regfile_system.rb = instruction[15:11];
     regfile_system.rc = instruction[25:21];
-
+    
+    //Assigning all direct connections to register data
+    r0_p1_live = regfile_system.r0_data;
+    r1_p2_live = regfile_system.r1_data;
+    r2_p3_live = regfile_system.r2_data;
+    r3_p4_live = regfile_system.r3_data;
+    r4_location = regfile_system.r4_data;
+    r5_rounds_ones = regfile_system.r5_data;
+    r6_rounds_tens = regfile_system.r6_data;
+    r18_change_loc = regfile_system.r18_data;
+    regfile_system.r8_data = r8_p1_button;
+    regfile_system.r9_data = r9_p2_button;
+    regfile_system.r10_data = r10_p3_button;
+    regfile_system.r11_data = r11_p4_button;
+    
+    regfile_system.r8_data_rise = r8_p1_button_rise;
+    regfile_system.r9_data_rise = r9_p2_button_rise;
+    regfile_system.r10_data_rise = r10_p3_button_rise;
+    regfile_system.r11_data_rise = r11_p4_button_rise;
+    regfile_system.r12_data_rise = r12_start_button_rise;
+    
     //****** ALU + WDSEL unit *******//
     // ASEL mux
     alu_system.alufn_signal = control_system.alufn;

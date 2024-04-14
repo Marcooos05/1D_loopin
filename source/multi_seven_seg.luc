@@ -1,19 +1,19 @@
 module multi_seven_seg #(
-    DIGITS = 4 : DIGITS > 0,
+    DIGITS = 6 : DIGITS > 0, //DIGITS represent the number of 7 seg to control
     DIV = 16 : DIV >= 0
   )(
     input clk,                // clock
     input rst,                // reset
-    input values [DIGITS][4], // values to show
+    input values [DIGITS][4], // values to show // [4] is the number of bits to represent 0-F in binary
     output seg [7],           // LED segments
-    output sel [DIGITS]       // Digit select
+    output sel [DIGITS]       // Digit select // select will now select from 6 avaliable 7 segs (0-3 for P1-P4 lives, 4 & 5 for no. of rounds)
   ) {
   
-  // number of bits required to store DIGITS-1
+  // number of bits required to store DIGITS-1, the number of 7 segs being used 
   const DIGIT_BITS = $clog2(DIGITS);
   
   .clk(clk), .rst(rst) {
-    counter ctr (#DIV(DIV), #SIZE(DIGIT_BITS), #TOP(DIGITS-1)); 
+    counter ctr (#DIV(DIV), #SIZE(DIGIT_BITS), #TOP(DIGITS-1));  // counter for the 6 availble 7 segs in use
   }
   
   seven_seg seg_dec;                      // segment decoder

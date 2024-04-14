@@ -7,36 +7,27 @@ module instruction_rom #(
   
    // Driver code, BR(reset) is the first instruction
   const INSTRUCTIONS = {
-    32h6FE50000, // 0x06C JMP(R5)
-    32hC0BF000C, // 0x068 ADDC(R31, 12, R5) --- reset handler, go to main in user mode 
-    32h6FE50000, // 0x064 JMP(R5)
-    32hC0BF000C, // 0x060 ADDC(R31, 12, R5) 
-    32h649F000C, // 0x05C ST(R4, 0xC, R31) 
-    32hC09F0001, // 0x058 ADDC(R31, 1, R4)
-    32h649F000C, // 0x054 ST(R4, 0xC, R31) 
-    32hC09F0002, // 0x050 ADDC(R31, 2, R4)
-    32h649F000C, // 0x04C ST(R4, 0xC, R31) 
-    32hC09F0003, // 0x048 ADDC(R31, 3, R4)
-    32h649F000C, // 0x044 ST(R4, 0xC, R31) 
-    32hC09F0004, // 0x040 ADDC(R31, 4, R4)
-    32h649F000C, // 0x03C ST(R4, 0xC, R31) --- countdown 5, 4, 3, 2, 1 to be be displayed at beta_output
-    32hC09F0005, // 0x038 ADDC(R31, 5, R4) --- illop handler, show generic countdown
-    32h6FE50000, // 0x034 JMP(R5) --- execute main
-    32hC0BF000C, // 0x030 ADDC(R31, 12, R5)  
-    32h649F000C, // 0x02C ST(R4, 0xC, R31) --- store to output_buffer: Mem[12] to display the input
-    32h609F0010, // 0x028 LD(R31, 16, R4) --- irq handler, load value from input_buffer: Mem[16]
-    32h00000100, // 0x024 LONG(256) --- trigger illop when R3's value is eventually 0 after several loops to main_sub
-    32h7BE3FFFB, // 0x020 BNE(R3, main_sub, R31) 
-    32h607F0020, // 0x01C LD(R31, 32, R3) 
-    32h643F0020, // 0x018 ST(R1, 32, R31)
-    32h90410800, // 0x014 CMPEQ(R1, R1, R2) 
-    32hC4210001, // 0x010 SUBC(R1, 1, R1) --- main_sub
-    32hC03F0003, // 0x00C ADDC(R31, 3, R1) --- main
-    32h77FF0007, // 0x008 BR(irq)
-    32h77FF000C, // 0x004 BR(illop)
-    32h77FF0019  // 0x000 BR(reset)
+    32h77FFFFEF,
+    32hC6730005,
+    32hC1BF0000,
+    32hC25F0000,
+    32hC25F0001, 
+    32hC09F0001, //location_1
+    
+    32h77FFFFF5,
+    32hC1BF0000,
+    32hC25F0000,
+    32hC25F0001,
+    32hC0840001,
+    32h77F40005,
+    32hD6840010, //update_location
+    
+    32h77FFFFFC,
+    32h7BD40001,
+    32h928D9800,
+    32hC1AD0001, //idle
+    32hC27F03E8 //main
   };
-
   always {
     out = INSTRUCTIONS[addr];
   }

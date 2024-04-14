@@ -7,7 +7,27 @@ module regfile_memory (
     output reg_data_2[32],
     input write_address[5],
     input write_data[32],
-    input write_enable
+    input write_enable,
+    
+    output r0_data[32],
+    output r1_data[32],
+    output r2_data[32],
+    output r3_data[32],
+    output r4_data[32],
+    output r5_data[32],
+    output r6_data[32],
+    output r18_data[32],
+    
+    input r8_data,
+    input r9_data,
+    input r10_data,
+    input r11_data,
+    
+    input r8_data_rise,
+    input r9_data_rise,
+    input r10_data_rise,
+    input r11_data_rise,
+    input r12_data_rise
   ) {
   
   dff registers[32][32](#INIT(32x{{32h0}}), .clk(clk), .rst(rst));
@@ -18,6 +38,34 @@ module regfile_memory (
     //always read 
     reg_data_1 = registers.q[read_address_1];
     reg_data_2 = registers.q[read_address_2];
+    r0_data = registers.q[5h0]; // testing to read the button input after, change back to 5h0-5h3 for register 0-1
+    r1_data = registers.q[5h1]; //remember that decimal 18 in hex is 12
+    r2_data = registers.q[5h2];
+    r3_data = registers.q[5h3];
+    r4_data = registers.q[5h4];
+    r5_data = registers.q[5h5];
+    r6_data = registers.q[5h6];
+    r18_data = registers.q[5h12];
+    registers.d[5h8] = r8_data;
+    registers.d[5h9] = r9_data;
+    registers.d[5hA] = r10_data;
+    registers.d[5hB] = r11_data;
+    
+    if (r12_data_rise == 1 && registers.q[5hC] == 0){ // when p4 button is pressed and the reg file is empty, then reg 17 will hold 1 
+        registers.d[5hC] = 32h1; 
+    }
+    if (r8_data_rise == 1 && registers.q[5hE] == 0){ // when p1 button is pressed and the reg file is empty, then reg 14 will hold 1 
+        registers.d[5hE] = 32h1; 
+    }
+    if (r9_data_rise == 1 && registers.q[5hF] == 0){ // when p2 button is pressed and the reg file is empty, then reg 15 will hold 1 
+        registers.d[5hF] = 32h1; 
+    }
+    if (r10_data_rise == 1 && registers.q[5h10] == 0){ // when p3 button is pressed and the reg file is empty, then reg 16 will hold 1 
+        registers.d[5h10] = 32h1; 
+    }
+    if (r11_data_rise == 1 && registers.q[5h11] == 0){ // when p4 button is pressed and the reg file is empty, then reg 17 will hold 1 
+        registers.d[5h11] = 32h1; 
+    }
     
     // check if write_en and its not R31 
     if (write_address != b11111 && write_enable){

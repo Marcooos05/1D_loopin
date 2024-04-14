@@ -1,0 +1,37 @@
+pin clk CLOCK;
+clock clk 100MHz;
+
+pin rst_n RESET;
+
+pin led[0] LED0;
+pin led[1] LED1;
+pin led[2] LED2;
+pin led[3] LED3;
+pin led[4] LED4;
+pin led[5] LED5;
+pin led[6] LED6;
+pin led[7] LED7;
+
+// flip the Tx/Rx lines
+pin usb_rx USB_TX;
+pin usb_tx USB_RX;
+
+pin outled C40;
+pin outled_p1 C43; //C42, C46, C45
+pin outled_p2 C42;
+pin outled_p3 C46;
+pin outled_p4 C45;
+
+pin io_sel[0] A9;
+pin io_sel[1] A8;
+pin io_sel[2] A42;
+pin io_sel[3] A43;
+pin io_sel[4] C9;
+pin io_sel[5] C8;
+
+pin io_button[0] B28 pulldown;
+pin io_button[1] B27 pulldown;
+pin io_button[2] B23 pulldown;
+pin io_button[3] B24 pulldown;
+pin io_button[4] C49 pulldown;
+pin io_button[5] C48 pulldown;
