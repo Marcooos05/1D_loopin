@@ -32,8 +32,8 @@ module au_top (
   edge_detector next_button_edge(#RISE(1), #FALL(0), .clk(clk));
   
   // interrupt button conditioners, edge detector, and input buffer
-  button_conditioner interrupt_button_conditioner[4](.clk(clk));
-  edge_detector interrupt_button_edge[4](#RISE(1), #FALL(0), .clk(clk));
+  //button_conditioner interrupt_button_conditioner[4](.clk(clk));
+  //edge_detector interrupt_button_edge[4](#RISE(1), #FALL(0), .clk(clk));
   
   button_conditioner player_button_conditioner[5](.clk(clk)); 
   edge_detector player_button_edge_rise[5](#RISE(1), #FALL(0), .clk(clk));
@@ -85,14 +85,14 @@ module au_top (
       fastclock_edge.in = frequency_divider.value[20];
     }
     // connect hardware interrupt button 
-    interrupt_button_conditioner.in = io_button[3:0];
-    interrupt_button_edge.in = interrupt_button_conditioner.out;
+    //interrupt_button_conditioner.in = io_button[3:0];
+    //interrupt_button_edge.in = interrupt_button_conditioner.out;
     
-    if (motherboard.r4_location == h01 || motherboard.r4_location == h02 || motherboard.r4_location == h03 || motherboard.r4_location == h04 || motherboard.r4_location ==h05 || motherboard.r4_location == h06 || motherboard.r4_location == h07 || motherboard.r4_location == h08 || motherboard.r4_location == h09 || motherboard.r4_location ==h0A || motherboard.r4_location == h0B || motherboard.r4_location == h0C || motherboard.r4_location == h0D || motherboard.r4_location == h0E || motherboard.r4_location == h0F || motherboard.r4_location == h10){
-        motherboard.irq = interrupt_button_edge.out; // IRQ as long as any of the player buttons[3:0] is pressed
-    } else {
+    //if (motherboard.r4_location == h01 || motherboard.r4_location == h02 || motherboard.r4_location == h03 || motherboard.r4_location == h04 || motherboard.r4_location ==h05 || motherboard.r4_location == h06 || motherboard.r4_location == h07 || motherboard.r4_location == h08 || motherboard.r4_location == h09 || motherboard.r4_location ==h0A || motherboard.r4_location == h0B || motherboard.r4_location == h0C || motherboard.r4_location == h0D || motherboard.r4_location == h0E || motherboard.r4_location == h0F || motherboard.r4_location == h10){
+    //    motherboard.irq = interrupt_button_edge.out; // IRQ as long as any of the player buttons[3:0] is pressed
+    //} else {
         motherboard.irq = 0;
-    }
+    //}
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
 
