@@ -237,6 +237,9 @@ BT(R20, end_game)					|| Branch to end game if start button pressed
 BEQ(R25, hold, R31)					|| Branch back to hold if R23 != R24
 
 end_game:
+ADDC(R31, 240, R4)					|| Update location to indicate RED LED
+CMOVE(1, R18)						|| Updating location on LED ring
+CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
 ADDC(R21, 0, R5)					|| Display rounds(ones) for endgame
 ADDC(R22, 0, R6)					|| Display rounds(tens) for endgame
 CMOVE(0, R12)						|| Make sure that start button is reset before entering end state
@@ -261,7 +264,9 @@ ADDC(R31, 0, R0)					|| Reset P1 lives
 ADDC(R31, 0, R1)					|| Reset P2 lives
 ADDC(R31, 0, R2)					|| Reset P3 lives
 ADDC(R31, 0, R3)					|| Reset P4 lives
-ADDC(R31, 0, R4)					|| Reset location
+ADDC(R31, 224, R4)					|| Update location to indicate RED LED
+CMOVE(1, R18)						|| Updating location on LED ring
+CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
 ADDC(R31, 0, R5)					|| Reset rounds(ones)
 ADDC(R31, 0, R6)					|| Reset rounds(tens)
 ADDC(R31, 0, R7)					|| Reset player count
