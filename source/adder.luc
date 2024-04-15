@@ -1,30 +1,37 @@
 module adder (
 // Note: a & b are 32-bit inputs. ALUFN is a 6-bit input
 // z, v, n are all 1-bit outputs.
-    input a[32],
-    input b[32],
+    input a[16],
+    input b[16],
     input alufn_signal[6],
-    output out[32],
+    output out[16],
     output z[1],
     output v[1],
     output n[1]
   ) {
   // The signal out is write only and cannot be read.
   // Hence, a signal s is used as a temp variable for the output.
-  sig s[32]; 
+  sig c, d, e, s[16]; //connectors
+  rca rca_unit;
   
   always {
-    s = 32b0; 
-
+// computing s
+    rca_unit.a = a;
+    rca_unit.b = b;
+    rca_unit.alufn = alufn_signal[0];
+    out = rca_unit.s;
+    s = rca_unit.s;
     
-    case(alufn_signal[0]){
-      0: s = a+b;
-      1: s = a-b;
-      default: s = 32b0;
-  }
-    n = s[31];
-    v = (a[31] & (b[31] ^ alufn_signal[0]) & !s[31]) | (!a[31] & !(b[31] ^ alufn_signal[0]) & s[31]); 
     z = ~|s;
+    
+    // v unit
+    c = alufn_signal[0] ^ b[15];
+    d = c & a[15] & ~s[15];
+    e = ~c & ~a[15] & s[15];
+    v = d | e;
+    
+    // n unit
+    n = s[15];
     out = s;
   }
 }

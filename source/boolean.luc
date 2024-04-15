@@ -1,22 +1,17 @@
 module boolean (
-    input a[32],
-    input b[32],
+    input a[16],
+    input b[16],
     input alufn_signal[6],
-    output out[32]
+    output out[16]
   ) {
 
+  mux_4 mux_4_16[16];
   
   always {
-
-    case(alufn_signal[3:0]){
+    mux_4_16.in = 16x{{alufn_signal[3:0]}}; 
+    mux_4_16.s0 = a;
+    mux_4_16.s1 = b;
     
-      b1000: out = a & b;
-      b1110: out = a | b;
-      b0110: out = a ^ b;
-      b1010: out = a;
-      default:
-        out = 32b0;
-    }
-   
+    out = mux_4_16.out;
   }
 }

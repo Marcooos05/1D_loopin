@@ -1,0 +1,24 @@
+module x_bit_right_shifter #(
+  // parameter declaration, to be set during module instantiation
+  // default value given is 8
+  SHIFT = 8 : SHIFT > -1 & SHIFT < 16
+  )(
+    input a[16],
+    input shift,
+    input pad,
+    output out[16]
+  ) {
+  mux_2 mux_2_shifter[16];
+  var i; 
+  sig shifted_bits[16];
+  
+  always {
+    shifted_bits[15:0] = c{SHIFTx{pad},a[15:0+SHIFT]};
+    for (i = 0; i<16; i++) {
+        mux_2_shifter.s0[i] = shift;
+        mux_2_shifter.in[i][0] = a[i];
+        mux_2_shifter.in[i][1] = shifted_bits[i];
+        }
+    out[15:0] = mux_2_shifter.out[15:0];
+  }
+}
