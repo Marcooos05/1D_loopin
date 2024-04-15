@@ -26,7 +26,6 @@
     <component>simple_ram.v</component>
     <src>player_led.luc</src>
     <component>edge_detector.luc</component>
-    <src>aa_editing.luc</src>
     <src>memory_unit.luc</src>
     <constraint>alchitry.acf</constraint>
     <constraint lib="true">io.acf</constraint>

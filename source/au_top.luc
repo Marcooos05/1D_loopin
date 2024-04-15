@@ -91,7 +91,7 @@ module au_top (
     //if (motherboard.r4_location == h01 || motherboard.r4_location == h02 || motherboard.r4_location == h03 || motherboard.r4_location == h04 || motherboard.r4_location ==h05 || motherboard.r4_location == h06 || motherboard.r4_location == h07 || motherboard.r4_location == h08 || motherboard.r4_location == h09 || motherboard.r4_location ==h0A || motherboard.r4_location == h0B || motherboard.r4_location == h0C || motherboard.r4_location == h0D || motherboard.r4_location == h0E || motherboard.r4_location == h0F || motherboard.r4_location == h10){
     //    motherboard.irq = interrupt_button_edge.out; // IRQ as long as any of the player buttons[3:0] is pressed
     //} else {
-        motherboard.irq = 0;
+        motherboard.irq = 4b0;
     //}
 
     next = (slowclock_edge.out & io_dip[2][7]) | next_button.q; // proceed either when next button is pressed or io_dip[2][7] is 1
@@ -149,6 +149,10 @@ module au_top (
       seg.values = {4b0,4b0,motherboard.ma[15:12], motherboard.ma[11:8],motherboard.ma[7:4], motherboard.ma[3:0]};
     h04: // MSB 16 bits of EA (this is also ALU output) (ma[31:16])
       seg.values = {4b0,4b0,motherboard.ma[31:28], motherboard.ma[27:24], motherboard.ma[23:20], motherboard.ma[19:16]}; 
+    h05: // LSB 16 bits of instruction address (ia[15:0])
+      io_led[0] = motherboard.ia[7:0];
+      io_led[1] = motherboard.ia[15:8];
+      seg.values = {4b0,4b0,motherboard.ia[15:12], motherboard.ia[11:8], motherboard.ia[7:4], motherboard.ia[3:0]};
         }
   }
 }
