@@ -1,252 +1,249 @@
-BEQ(R31, reset, R31)						|| reset handler 0x00000000
+BEQ(R31, reset, R31)					|| reset handler 0x00000000
 BEQ(R31, illop, R31)						|| illop handler  0x00000004
 BEQ(R31, irq, R31)						|| irq handler    0x00000008
 
 start: 
-BNE(R12, player_select, R31) 					|| Check if start button is pressed, if yes branch to player_select
-BEQ(R31, start, R31)						|| Loop back to start
+BNE(R12, player_select, R31) 				|| Check if start button is pressed, if yes branch to player_select
+BEQ(R31, start, R31)					|| Loop back to start
 
 || PLAYER SELECT ||
 player_select: 
-ADDC(R31, 0, R12)						|| Reset R12 edge detector of Start button to avoid a clash with end game Reset 
-BNE(R8, new_player1, R30)					|| Check if P1 button is pressed, if yes branch to new_player1
-BNE(R9, new_player2, R30) 					|| Check if P2 button is pressed, if yes branch to new_player2
-BNE(R10, new_player3, R30) 					|| Check if P3 button is pressed, if yes branch to new_player3
-BNE(R11, new_player4, R30) 					|| Check if P4 button is pressed, if yes branch to new_player4
-BEQ(R7, reset, R31) 						|| Reset registers and return to start if player count is 0
-CMOVE(0, R14)							|| Reset DFF containing Player 1 button press
-CMOVE(0, R15)							|| Reset DFF containing Player 2 button press
-CMOVE(0, R16)							|| Reset DFF containing Player 3 button press
-CMOVE(0, R17)							|| Reset DFF containing Player 4 button press
-ADDC(R31, 1, R4)						|| Set location = 1
-ADDC(R31, 1, R5)						|| Set round(ones) = 1
-ADDC(R31, 0, R6)						|| Set round(tens) = 0
-ADDC(R31, 5000, R19)						|| Set counter max value to 5000 ##VARIABLE
-BEQ(R31, idle, R31)						|| Branching directly to idle 
+ADDC(R31, 0, R12)					|| Reset R12 edge detector of Start button to avoid a clash with end game Reset 
+BNE(R8, new_player1, R30)				|| Check if P1 button is pressed, if yes branch to new_player1
+BNE(R9, new_player2, R30) 				|| Check if P2 button is pressed, if yes branch to new_player2
+BNE(R10, new_player3, R30) 				|| Check if P3 button is pressed, if yes branch to new_player3
+BNE(R11, new_player4, R30) 				|| Check if P4 button is pressed, if yes branch to new_player4
+BEQ(R7, reset, R31) 					|| Reset registers and return to start if player count is 0
+CMOVE(0, R14)						|| Reset DFF containing Player 1 button press
+CMOVE(0, R15)						|| Reset DFF containing Player 2 button press
+CMOVE(0, R16)						|| Reset DFF containing Player 3 button press
+CMOVE(0, R17)						|| Reset DFF containing Player 4 button press
+ADDC(R31, 1, R4)					|| Set location = 1 ##ALWAYS TICK R18 TO VIEW UPDATED LOCATION ON LED RING
+ADDC(R31, 1, R18)					|| Updating location on LED ring
+ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring 
+ADDC(R31, 1, R5)					|| Set round(ones) = 1
+ADDC(R31, 0, R6)					|| Set round(tens) = 0
+ADDC(R31, 5000, R19)					|| Set counter max value to 5000 ##VARIABLE
+BEQ(R31, idle, R31)					|| Branching directly to idle 
 
-new_player1: ADDC(R31, 5, R0) 					|| Populate 5 lives to Player 1 ##VARIABLE
-ADDC(R7, 1, R7) 						|| Increase player count by 1
-JMP(R30) 							|| Return to PC+4 before branching
+new_player1: 
+ADDC(R31, 5, R0) 					|| Populate 5 lives to Player 1 ##VARIABLE
+ADDC(R7, 1, R7) 					|| Increase player count by 1
+JMP(R30) 						|| Return to PC+4 before branching
 
-new_player2: ADDC(R31, 5, R1)					|| Populate 5 lives to Player 2 ##VARIABLE
-ADDC(R7, 1, R7)							|| Increase player count by 1
-JMP(R30)							|| Return to PC+4 before branching
+new_player2: 
+ADDC(R31, 5, R1)					|| Populate 5 lives to Player 2 ##VARIABLE
+ADDC(R7, 1, R7)						|| Increase player count by 1
+JMP(R30)						|| Return to PC+4 before branching
 
-new_player3: ADDC(R31, 5, R2)					|| Populate 5 lives to Player 3 ##VARIABLE
-ADDC(R7, 1, R7)							|| Increase player count by 1
-JMP(R30)							|| Return to PC+4 before branching
+new_player3: 
+ADDC(R31, 5, R2)					|| Populate 5 lives to Player 3 ##VARIABLE
+ADDC(R7, 1, R7)						|| Increase player count by 1
+JMP(R30)						|| Return to PC+4 before branching
 
-new_player4: ADDC(R31, 5, R3)					|| Populate 5 lives to Player 4 ##VARIABLE
-ADDC(R7, 1, R7)							|| Increase player count by 1
-JMP(R30)							|| Return to PC+4 before branching
+new_player4: 
+ADDC(R31, 5, R3)					|| Populate 5 lives to Player 4 ##VARIABLE
+ADDC(R7, 1, R7)						|| Increase player count by 1
+JMP(R30)						|| Return to PC+4 before branching
 
 || IDLE ||
 idle: 
-BNE(R14, p1_button_press, R30)					|| ##NEW check if p1 pressed
-BNE(R15, p2_button_press, R30)					|| ##NEW check if p2 pressed
-BNE(R16, p3_button_press, R30)					|| ##NEW check if p3 pressed
-BNE(R17, p4_button_press, R30)					|| ##NEW check if p4 pressed
-ADDC(R13, 1, R13)						|| add one to counter
-CMPEQ(R13, R19, R20)						|| check if counter = counter max, store result in R20
-BNE(R20, update_location, R31)					|| update location when R20 = 1
-BEQ(R31, idle, R31)						|| Loop back to idle
+BNE(R14, p1_button_press, R30)				|| ##NEW check if p1 pressed
+BNE(R15, p2_button_press, R30)				|| ##NEW check if p2 pressed
+BNE(R16, p3_button_press, R30)				|| ##NEW check if p3 pressed
+BNE(R17, p4_button_press, R30)				|| ##NEW check if p4 pressed
+ADDC(R13, 1, R13)					|| add one to counter
+CMPEQ(R13, R19, R20)					|| check if counter = counter max, store result in R20
+BNE(R20, update_location, R31)				|| update location when R20 = 1
+BEQ(R31, idle, R31)					|| Loop back to idle
 
 || UPDATE LOCATION ||
 update_location: 
-CMPEQC(R4, 16, R20)						|| Check if location = 16
-BNE(R20, location_1, R30)					|| Branch if location = 16
-ADDC(R4, 1, R4)							|| Increase location by 1
-ADDC(R31, 1, R18)						|| Updating location on LED ring
-ADDC(R31, 0, R18) 						|| Reset R18 after updating LED ring 
-ADDC(R31, 0, R13) 						|| Reset counter to 0
+CMPEQC(R4, 16, R20)					|| Check if location = 16
+BNE(R20, location_1, R30)				|| Branch if location = 16
+ADDC(R4, 1, R4)						|| Increase location by 1
+ADDC(R31, 1, R18)					|| Updating location on LED ring
+ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring 
+ADDC(R31, 0, R13) 					|| Reset counter to 0
 
-CMPEQC(R4, 5, R20)						|| Check if location = 5
-BNE(R20, location_5, R30)					|| Branch if location = 5
-CMPEQC(R4, 9, R20)						|| Check if location = 9
-BNE(R20, location_9, R30)					|| Branch if location = 9
-CMPEQC(R4, 13, R20)						|| Check if location = 13
-BNE(R20, location_13, R30)					|| Branch if location = 13
-BEQ(R31, idle, R31) 						|| Branch back to idle
+CMPEQC(R4, 5, R20)					|| Check if location = 5
+BNE(R20, location_5, R30)				|| Branch if location = 5
+CMPEQC(R4, 9, R20)					|| Check if location = 9
+BNE(R20, location_9, R30)				|| Branch if location = 9
+CMPEQC(R4, 13, R20)					|| Check if location = 13
+BNE(R20, location_13, R30)				|| Branch if location = 13
+BEQ(R31, idle, R31) 					|| Branch back to idle
 
 location_1: 
-ADDC(R31, 1, R4) 						|| Set location to 1
-ADDC(R31, 1, R18)						|| Updating location on LED ring
-ADDC(R31, 0, R18) 						|| Reset R18 after updating LED ring 
-ADDC(R31, 0, R13) 						|| Reset counter to 0
+ADDC(R31, 1, R4) 					|| Set location to 1
+ADDC(R31, 1, R18)					|| Updating location on LED ring
+ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring 
+ADDC(R31, 0, R13) 					|| Reset counter to 0
 
 ||Faster & increase round count
-SUBC(R19, 50, R19)						|| Reduce counter max value by 10, i.e. increase speed ##Variable
-ADDC(R5, 1, R5) 						|| Increase rounds (ones) by 1
-CMPEQC(R5, 10, R21)						|| Check if rounds (ones) is 10
-BNE(R21, location_update_tens, R30)				|| Update rounds
+SUBC(R19, 50, R19)					|| Reduce counter max value by 50, i.e. increase speed ##Variable
+ADDC(R5, 1, R5) 					|| Increase rounds (ones) by 1
+CMPEQC(R5, 10, R21)					|| Check if rounds (ones) is 10
+BNE(R21, location_update_tens, R30)			|| Update rounds
 
 ||Check player input
-BEQ(R0, idle, R31)			 			|| Branch to idle if P1 life == 0 
-BEQ(R14, subtract_p1_life, R30) 				|| Branch to subtract if button was not press
-ADDC(R31, 0, R14) 						|| Reset P1 button press
-BEQ(R31, idle, R31)			 			|| Branch back to idle
+BEQ(R0, idle, R31)			 		|| Branch to idle if P1 life == 0 
+BEQ(R14, subtract_p1_life, R30) 			|| Branch to subtract if button was not press
+ADDC(R31, 0, R14) 					|| Reset P1 button press
+BEQ(R31, idle, R31)			 		|| Branch back to idle
 
 location_update_tens: 
-ADDC(R31, 0, R5)						|| Set rounds (ones) to 0
-ADDC(R6, 1, R6)							|| Add 1 to rounds(tens)
-JMP(R30)							|| Return to next instruction before the branch 
+ADDC(R31, 0, R5)					|| Set rounds (ones) to 0
+ADDC(R6, 1, R6)						|| Add 1 to rounds(tens)
+JMP(R30)						|| Return to next instruction before the branch 
 
 location_5: 
-BEQ(R1, idle, R31)			 			|| Branch to idle if no lives
-BEQ(R15, subtract_p2_life, R30) 				|| Subtract life if no button press
-ADDC(R31, 0, R15) 						|| Reset P2 button press
-BEQ(R31, idle, R31)			 			|| Branch back to idle
+BEQ(R1, idle, R31)			 		|| Branch to idle if no lives
+BEQ(R15, subtract_p2_life, R30) 			|| Subtract life if no button press
+ADDC(R31, 0, R15) 					|| Reset P2 button press
+BEQ(R31, idle, R31)		 			|| Branch back to idle
 
 location_9: 
-BEQ(R2, idle, R31)			 			|| Branch to idle if no lives
-BEQ(R16, subtract_p3_life, R30) 				|| Subtract life if no button press
-ADDC(R31, 0, R16) 						|| Reset P3 button press
-BEQ(R31, idle, R31)			 			|| Branch back to idle
+BEQ(R2, idle, R31)			 		|| Branch to idle if no lives
+BEQ(R16, subtract_p3_life, R30) 			|| Subtract life if no button press
+ADDC(R31, 0, R16) 					|| Reset P3 button press
+BEQ(R31, idle, R31)		 			|| Branch back to idle
 
 location_13: 
-BEQ(R3, idle, R31)			 			|| Branch to idle if no lives
-BEQ(R17, subtract_p4_life, R30)					|| Subtract life if no button press
-ADDC(R31, 0, R17) 						|| Reset P4 button press
-BEQ(R31, idle, R31)			 			|| Branch back to idle
+BEQ(R3, idle, R31)			 		|| Branch to idle if no lives
+BEQ(R17, subtract_p4_life, R30)				|| Subtract life if no button press
+ADDC(R31, 0, R17) 					|| Reset P4 button press
+BEQ(R31, idle, R31)		 			|| Branch back to idle
 
 || BUTTON PRESS EVENT ||
-return_p1:
-JMP(R30)							|| return to previous running line
+return_back:
+JMP(R30)						|| return to previous running line
 
 p1_button_press: 
-BEQ(R0, return_p1, R31)						|| Branch to previous running line if no lives
-CMPEQC(R4, 16, R20)						|| Check if location = 16
-BNE(R20, return_p1, R31)					|| Branch back to previous running line if button press at right time
+BEQ(R0, return_back, R31)				|| Branch to return_back branch if no lives
+CMPEQC(R4, 16, R20)					|| Check if location = 16
+BNE(R20, return_back, R31)				|| Branch to return_back line if button press at right time
 
 subtract_p1_life: 
-SUBC(R0, 1, R0)							|| Reduce P1 life by 1
-ADDC(R31, 0, R14) 						|| Reset P1 button press
-BEQ(R0, decrease_player_count, R31)				|| If P1 no lives left, branch to decrease player count
-BEQ(R31, return_p1, R31)					|| Branch back to previous running line
-
-return_p2:
-JMP(R30)							|| return to previous running line
+SUBC(R0, 1, R0)						|| Reduce P1 life by 1
+ADDC(R31, 0, R14) 					|| Reset P1 button press
+BEQ(R0, decrease_player_count, R31)			|| If P1 no lives left, branch to decrease player count
+BEQ(R31, return_back, R31)				|| Branch to return_back
 
 p2_button_press: 
-BEQ(R1, return_p2, R31)						|| Branch to previous running line if no lives
-CMPEQC(R4, 4, R20)						|| Check if location = 4
-BNE(R20, return_p2, R31)					|| Branch back to previous running line if button press at right time
+BEQ(R1, return_back, R31)				|| Branch to return_back if no lives
+CMPEQC(R4, 4, R20)					|| Check if location = 4
+BNE(R20, return_back, R31)				|| Branch back to return_back line if button press at right time
 
 subtract_p2_life: 
-SUBC(R1, 1, R1)							|| Reduce life by 1
-ADDC(R31, 0, R15) 						|| Reset P2 button press
-BEQ(R1, decrease_player_count, R31)				|| If P2 no lives left, branch to decrease player count
-BEQ(R31, return_p2, R31)					|| Branch back to previous running line
-
-return_p3:	
-JMP(R30)							|| return to previous running line
+SUBC(R1, 1, R1)						|| Reduce life by 1
+ADDC(R31, 0, R15) 					|| Reset P2 button press
+BEQ(R1, decrease_player_count, R31)			|| If P2 no lives left, branch to decrease player count
+BEQ(R31, return_back, R31)				|| Branch to return_back
 
 p3_button_press: 
-BEQ(R2, return_p3, R31)						|| Branch to previous running line if no lives
-CMPEQC(R4, 8, R20)						|| Check if location = 8
-BNE(R20, return_p3, R31)					|| Branch back to previous running line if button press at right time
+BEQ(R2, return_back, R31)				|| Branch to return_back if no lives
+CMPEQC(R4, 8, R20)					|| Check if location = 8
+BNE(R20, return_back, R31)				|| Branch to return_back line if button press at right time
 
 subtract_p3_life: 
-SUBC(R2, 1, R2)							|| Reduce life by 1
-ADDC(R31, 0, R16) 						|| Reset P3 button press
-BEQ(R2, decrease_player_count, R31)				|| If P3 no lives left, branch to decrease player count
-BEQ(R31, return_p3, R31)					|| Branch back to previous running line
-
-return_p4:
-JMP(R30)							|| return to previous running line
+SUBC(R2, 1, R2)						|| Reduce life by 1
+ADDC(R31, 0, R16) 					|| Reset P3 button press
+BEQ(R2, decrease_player_count, R31)			|| If P3 no lives left, branch to decrease player count
+BEQ(R31, return_back, R31)				|| Branch to return_back line
 
 p4_button_press: 
-BEQ(R3, return_p4, R31)						|| Branch to previous running line if no lives
-CMPEQC(R4, 12, R20)						|| Check if location = 12
-BNE(R20, return_p4, R31)						|| Branch back to previous running line if button press at right time
+BEQ(R3, return_back, R31)				|| Branch to return_back line if no lives
+CMPEQC(R4, 12, R20)					|| Check if location = 12
+BNE(R20, return_back, R31)				|| Branch to return_back line if button press at right time
 
 subtract_p4_life: 
-SUBC(R3, 1, R3)							|| Reduce life by 1
-ADDC(R31, 0, R17) 						|| Reset P4 button press
-BEQ(R3, decrease_player_count, R31)				|| If P4 no lives left, branch to decrease player count
-BEQ(R31, return_p4, R31)					|| Branch back to previous running line
+SUBC(R3, 1, R3)						|| Reduce life by 1
+ADDC(R31, 0, R17) 					|| Reset P4 button press
+BEQ(R3, decrease_player_count, R31)			|| If P4 no lives left, branch to decrease player count
+BEQ(R31, return_back, R31)				|| Branch to return_back line
 
 decrease_player_count: 
-SUBC(R7, 1, R7)							|| Reduce player count by 1
-CMPLEC(R7, 1, R20)						|| Check if player count <= 1
-BEQ(R20, idle, R31)						|| Branch back to idle if player count > 1
-CMOVE(0, R12)							|| Make sure that start button is reset before entering winning conditions
-ADDC(R31, 25000, R23)						|| Set max count for end state ##VARIABLE - currently 5-6 times of one location tick
-CMPEQC(R0, 0, R20)						|| Check if player 1 is dead
-BEQ(R20, p1_win, R31)						|| Branch if player 1 alive
-CMPEQC(R1, 0, R20)						|| Check if player 2 is dead
-BEQ(R20, p2_win, R31)						|| Branch if player 2 alive
-CMPEQC(R2, 0, R20)						|| Check if player 3 is dead
-BEQ(R20, p3_win, R31)						|| Branch if player 3 alive
-CMPEQC(R3, 0, R20)						|| Check if player 4 is dead
-BEQ(R20, p4_win, R31)						|| Branch if player 4 alive
+SUBC(R7, 1, R7)						|| Reduce player count by 1
+CMPLEC(R7, 1, R20)					|| Check if player count <= 1
+BEQ(R20, idle, R31)					|| Branch back to idle if player count > 1
+CMOVE(0, R12)						|| Make sure that start button is reset before entering winning conditions
+ADDC(R31, 25000, R23)					|| Set max count for end state ##VARIABLE - currently 5-6 times of one location tick
+CMPEQC(R0, 0, R20)					|| Check if player 1 is dead
+BEQ(R20, p1_win, R31)					|| Branch if player 1 alive
+CMPEQC(R1, 0, R20)					|| Check if player 2 is dead
+BEQ(R20, p2_win, R31)					|| Branch if player 2 alive
+CMPEQC(R2, 0, R20)					|| Check if player 3 is dead
+BEQ(R20, p3_win, R31)					|| Branch if player 3 alive
+CMPEQC(R3, 0, R20)					|| Check if player 4 is dead
+BEQ(R20, p4_win, R31)					|| Branch if player 4 alive
 
-ADDC(R31, 240, R4)						|| Display RED LED RING after single player ends
-CMOVE(1, R18)							|| Updating location on LED ring
-CMOVE(0, R18)							|| Reset R18 after updating LED ring
-BEQ(R31, end_game_loop, R31)					|| Branch to endgame without winner to display highest round count 
+ADDC(R31, 240, R4)					|| Display RED LED RING after single player ends
+CMOVE(1, R18)						|| Updating location on LED ring
+CMOVE(0, R18)						|| Reset R18 after updating LED ring
+BEQ(R31, end_game_loop, R31)				|| Branch to endgame without winner to display highest round count 
 
 || WINNING CONDITION ||
 p1_win: 
-ADDC(R31, 241, R4)						|| Update location to F1 to indicate P1 win
-CMOVE(1, R18)							|| Updating location on LED ring
-CMOVE(0, R18) 							|| Reset R18 after updating LED ring 
+ADDC(R31, 241, R4)					|| Update location to F1 to indicate P1 win
+CMOVE(1, R18)						|| Updating location on LED ring
+CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
 ||ADDC(R31, 241, R7)						|| Update player count to indicate p1 win ##REMOVE LINE 
-ADDC(R5, 0, R21)						|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)						|| Temporarily store rounds(tens) for endgame
-ADDC(R31, 15, R6)						|| Display P on 7-seg(tens)
-ADDC(R31, 1, R5)						|| Display 1 on 7-seg(ones)
-BEQ(R31, hold, R30)						|| Hold winner for some time
+ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
+ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
+ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
+ADDC(R31, 1, R5)					|| Display 1 on 7-seg(ones)
+BEQ(R31, hold, R30)					|| Hold winner for some time
 
 p2_win: 
-ADDC(R31, 242, R4)						|| Update location to F2 to indicate P2 win
-CMOVE(1, R18)							|| Updating location on LED ring
-CMOVE(0, R18) 							|| Reset R18 after updating LED ring 
+ADDC(R31, 242, R4)					|| Update location to F2 to indicate P2 win
+CMOVE(1, R18)						|| Updating location on LED ring
+CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
 ||ADDC(R31, 242, R7)						|| Update player count to indicate p2 win ##REMOVE LINE 
-ADDC(R5, 0, R21)						|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)						|| Temporarily store rounds(tens) for endgame
-ADDC(R31, 15, R6)						|| Display P on 7-seg(tens)
-ADDC(R31, 2, R5)						|| Display 2 on 7-seg(ones)
-BEQ(R31, hold, R30)						|| Hold winner for some time
+ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
+ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
+ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
+ADDC(R31, 2, R5)					|| Display 2 on 7-seg(ones)
+BEQ(R31, hold, R30)					|| Hold winner for some time
 
 p3_win: 
-ADDC(R31, 243, R4)						|| Update location to indicate p3 win
-CMOVE(1, R18)							|| Updating location on LED ring
-CMOVE(0, R18) 							|| Reset R18 after updating LED ring 
+ADDC(R31, 243, R4)					|| Update location to indicate p3 win
+CMOVE(1, R18)						|| Updating location on LED ring
+CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
 ||ADDC(R31, 243, R7)						|| Update player count to indicate p3 win ##REMOVE LINE 
-ADDC(R5, 0, R21)						|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)						|| Temporarily store rounds(tens) for endgame
-ADDC(R31, 15, R6)						|| Display P on 7-seg(tens)
-ADDC(R31, 3, R5)						|| Display 3 on 7-seg(ones)
-BEQ(R31, hold, R30)						|| Hold winner for some time
+ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
+ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
+ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
+ADDC(R31, 3, R5)					|| Display 3 on 7-seg(ones)
+BEQ(R31, hold, R30)					|| Hold winner for some time
 
 p4_win: 
-ADDC(R31, 244, R4)						|| Update location to indicate p4 win
-CMOVE(1, R18)							|| Updating location on LED ring
-CMOVE(0, R18) 							|| Reset R18 after updating LED ring 
+ADDC(R31, 244, R4)					|| Update location to indicate p4 win
+CMOVE(1, R18)						|| Updating location on LED ring
+CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
 ||ADDC(R31, 244, R7)						|| Update player count to indicate p4 win ##REMOVE LINE 
-ADDC(R5, 0, R21)						|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)						|| Temporarily store rounds(tens) for endgame
-ADDC(R31, 15, R6)						|| Display P on 7-seg(tens)
-ADDC(R31, 4, R5)						|| Display 4 on 7-seg(ones)
-BEQ(R31, hold, R30)						|| Hold winner for some time
+ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
+ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
+ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
+ADDC(R31, 4, R5)					|| Display 4 on 7-seg(ones)
+BEQ(R31, hold, R30)					|| Hold winner for some time
 
 ||ENDING STATE||
 hold: 
-ADDC(R24, 1, R24)						|| Temporary timer increment
-CMPEQ(R23, R24, R25)						|| Compare timer with timer max value
-CMPEQC(R12, 1, R20)						|| Check for start button press
-BT(R20, end_game)						|| Branch to end game if start button pressed
-BEQ(R25, hold, R31)						|| Branch back to hold if R23 != R24
+ADDC(R24, 1, R24)					|| Temporary timer increment of 1 ##VARIABLE
+CMPEQ(R23, R24, R25)					|| Compare timer with timer max value
+CMPEQC(R12, 1, R20)					|| Check for start button press
+BT(R20, end_game)					|| Branch to end game if start button pressed
+BEQ(R25, hold, R31)					|| Branch back to hold if R23 != R24
 
 end_game:
-ADDC(R21, 0, R5)						|| Display rounds(ones) for endgame
-ADDC(R22, 0, R6)						|| Display rounds(tens) for endgame
-CMOVE(0, R12)							|| Make sure that start button is reset before entering end state
+ADDC(R21, 0, R5)					|| Display rounds(ones) for endgame
+ADDC(R22, 0, R6)					|| Display rounds(tens) for endgame
+CMOVE(0, R12)						|| Make sure that start button is reset before entering end state
 
 end_game_loop: 
-BNE(R12, reset, R31)						|| Wait for reset
-BEQ(R31, end_game_loop, R31)					|| Loop back if no action
+BNE(R12, reset, R31)					|| Wait for reset
+BEQ(R31, end_game_loop, R31)				|| Loop back if no action
 
 || IRQ HANDLER, KERNEL PROGRAM ||
 irq: 
@@ -260,31 +257,31 @@ JMP(R20)							|| Jump back to start
 
 || RESET HANDLER, KERNEL PROGRAM ||
 reset: 
-ADDC(R31, 0, R0)						|| Reset P1 lives
-ADDC(R31, 0, R1)						|| Reset P2 lives
-ADDC(R31, 0, R2)						|| Reset P3 lives
-ADDC(R31, 0, R3)						|| Reset P4 lives
-ADDC(R31, 0, R4)						|| Reset location
-ADDC(R31, 0, R5)						|| Reset rounds(ones)
-ADDC(R31, 0, R6)						|| Reset rounds(tens)
-ADDC(R31, 0, R7)						|| Reset player count
-ADDC(R31, 0, R8)						|| Reset P1 press
-ADDC(R31, 0, R9)						|| Reset P2 press
-ADDC(R31, 0, R10)						|| Reset P3 press
-ADDC(R31, 0, R11)						|| Reset P4 press
-ADDC(R31, 0, R12)						|| Reset Start button to avoid clash with start
-ADDC(R31, 0, R13)						|| Reset counter
-ADDC(R31, 0, R14)						|| Reset P1 record press
-ADDC(R31, 0, R15)						|| Reset P2 record press
-ADDC(R31, 0, R16)						|| Reset P3 record press
-ADDC(R31, 0, R17)						|| Reset P4 record press
-ADDC(R31, 0, R18)						|| Reset change location
-ADDC(R31, 0, R19)						|| Reset counter max value
-CMOVE(0, R21)							|| Reset Temp Reg
-CMOVE(0, R22)							|| Reset Temp Reg
-CMOVE(0, R23)							|| Reset Temp Reg
-CMOVE(0, R24)							|| Reset Temp Reg
-CMOVE(0, R25)							|| Reset Temp Reg
-CMOVE(0, R30)							|| Reset Temp Reg
-ADDC(R31, 12, R20)						|| start at h00C = d12
-JMP(R20)							|| Jump back to start
+ADDC(R31, 0, R0)					|| Reset P1 lives
+ADDC(R31, 0, R1)					|| Reset P2 lives
+ADDC(R31, 0, R2)					|| Reset P3 lives
+ADDC(R31, 0, R3)					|| Reset P4 lives
+ADDC(R31, 0, R4)					|| Reset location
+ADDC(R31, 0, R5)					|| Reset rounds(ones)
+ADDC(R31, 0, R6)					|| Reset rounds(tens)
+ADDC(R31, 0, R7)					|| Reset player count
+ADDC(R31, 0, R8)					|| Reset P1 press
+ADDC(R31, 0, R9)					|| Reset P2 press
+ADDC(R31, 0, R10)					|| Reset P3 press
+ADDC(R31, 0, R11)					|| Reset P4 press
+ADDC(R31, 0, R12)					|| Reset Start button to avoid clash with start
+ADDC(R31, 0, R13)					|| Reset counter
+ADDC(R31, 0, R14)					|| Reset P1 record press
+ADDC(R31, 0, R15)					|| Reset P2 record press
+ADDC(R31, 0, R16)					|| Reset P3 record press
+ADDC(R31, 0, R17)					|| Reset P4 record press
+ADDC(R31, 0, R18)					|| Reset change location
+ADDC(R31, 0, R19)					|| Reset counter max value
+CMOVE(0, R21)						|| Reset Temp Reg
+CMOVE(0, R22)						|| Reset Temp Reg
+CMOVE(0, R23)						|| Reset Temp Reg
+CMOVE(0, R24)						|| Reset Temp Reg
+CMOVE(0, R25)						|| Reset Temp Reg
+CMOVE(0, R30)						|| Reset Temp Reg || R26-R29 not in use
+ADDC(R31, 12, R20)					|| start at h00C = d12
+JMP(R20)						|| Jump back to start
