@@ -84,7 +84,7 @@ module motherboard (
   
   dff led_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(0)); // 2 bit to encode a color per pixel
                                                                                                                                       //starting light display
-  dff temp_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(4x{c{3x{3b111}, 3x{3b000}, 3x{3b111}, 3x{3b000}}})); // holds temporary value (double buffering)
+  dff temp_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(4x{c{3x{3b111}, 3x{3b110}, 3x{3b101}, 3x{3b100}}})); // holds temporary value (double buffering)
   
   ws2812b_writer led_strip(#PIXEL_COUNT(PIXEL_COUNT), .clk(clk), .rst(rst)); 
   fsm state(.clk(clk), .rst(rst)) = {INIT, LOAD, IDLE};
