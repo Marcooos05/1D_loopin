@@ -45,23 +45,14 @@ module player_led #(
               if(fall) {
                 led.clear = 1;
               }
-        } else {
-             if(location == 16h0){
-                if (rise){
-                  temp_encoding.d = b001;
-                  led_state.d = led_state.LOAD;
-                } 
-                if(fall) {
-                  temp_encoding.d = b010;
-                  led_state.d = led_state.LOAD;
-                }
+        
           } else {
                 if (led_encoding.q != b010){
                   temp_encoding.d = b010;
                   led_state.d = led_state.LOAD;
                 }  
           }
-        }
+        
       
       led_state.INIT: 
            if (led.reset & delay.value){ //  you need to artificially introduce some delay before sending data to the LED strip

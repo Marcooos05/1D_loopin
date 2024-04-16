@@ -71,15 +71,10 @@ module au_top (
     // driving the beta 
     slowclock_edge.in = frequency_divider.value[27];
     case(io_dip[1]){
-      h00: fastclock_edge.in = frequency_divider.value[14];
-      h01: fastclock_edge.in = frequency_divider.value[12];
-      h02: fastclock_edge.in = frequency_divider.value[10]; //count 1000, decrease by 5
-      h03: fastclock_edge.in = frequency_divider.value[9];
-      h04: fastclock_edge.in = frequency_divider.value[8]; 
-      h05: fastclock_edge.in = frequency_divider.value[7]; //
-      h06: fastclock_edge.in = frequency_divider.value[6]; //Faster clock
-      h07: fastclock_edge.in = frequency_divider.value[5]; 
-      h08: fastclock_edge.in = frequency_divider.value[4];
+      h01: fastclock_edge.in = frequency_divider.value[16];
+      h02: fastclock_edge.in = frequency_divider.value[15]; 
+      h04: fastclock_edge.in = frequency_divider.value[14]; 
+      h08: fastclock_edge.in = frequency_divider.value[20];
       
       default:
       fastclock_edge.in = frequency_divider.value[25];
@@ -113,7 +108,7 @@ module au_top (
     
     // debugger to view Beta state    
     seg.values = {motherboard.r6_rounds_tens,motherboard.r5_rounds_ones,motherboard.r3_p4_live,motherboard.r2_p3_live,motherboard.r1_p2_live,motherboard.r0_p1_live};
-    io_seg = ~seg.seg; //bit wise not function to view in io_shield, else seg.seg directly 
+    io_seg = seg.seg; //bit wise not function to view in io_shield, else seg.seg directly 
     io_sel = ~seg.sel; 
     
     //connect button inputs to register files

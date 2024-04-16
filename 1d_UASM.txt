@@ -24,7 +24,7 @@ ADDC(R31, 1, R18)					|| Updating location on LED ring
 ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring 
 ADDC(R31, 1, R5)					|| Set round(ones) = 1
 ADDC(R31, 0, R6)					|| Set round(tens) = 0
-ADDC(R31, 1000, R19)					|| Set counter max value to 10000 ##VARIABLE
+ADDC(R31, 40, R19)					|| Set counter max value to 100 ##VARIABLE
 BEQ(R31, waitstart, R31)				|| Branching directly to wait start right before idle state
 
 waitstart: 
@@ -86,9 +86,9 @@ ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring
 ADDC(R31, 0, R13) 					|| Reset counter to 0
 
 ||Faster & increase round count
-CMPEQC(R19, 40, R20)					|| Check if R19 is already the fastest 
+CMPEQC(R19, 4, R20)					|| Check if R19 is already the fastest 
 BT(R20, skip)						|| Do not subtract if speed already the fastest
-SUBC(R19, 40, R19)					|| Reduce counter max value by 40, i.e. increase speed ##Variable
+SUBC(R19, 4, R19)					|| Reduce counter max value by 4, i.e. increase speed ##Variable
 skip:
 ADDC(R5, 1, R5) 					|| Increase rounds (ones) by 1
 CMPEQC(R5, 10, R21)					|| Check if rounds (ones) is 10
@@ -176,7 +176,7 @@ SUBC(R7, 1, R7)						|| Reduce player count by 1
 CMPLEC(R7, 1, R20)					|| Check if player count <= 1
 BEQ(R20, idle, R31)					|| Branch back to idle if player count > 1
 CMOVE(0, R12)					|| Make sure that start button is reset before entering winning conditions
-ADDC(R31, 30000, R23)					|| Set max count for end state ##VARIABLE - currently 5-6 times of one location tick
+ADDC(R31, 3000, R23)					|| Set max count for end state ##VARIABLE - currently 5-6 times of one location tick
 ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
 ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
 CMPEQC(R0, 0, R20)					|| Check if player 1 is dead
