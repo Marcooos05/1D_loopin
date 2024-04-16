@@ -82,7 +82,10 @@ ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring
 ADDC(R31, 0, R13) 					|| Reset counter to 0
 
 ||Faster & increase round count
-SUBC(R19, 20, R19)					|| Reduce counter max value by 20, i.e. increase speed ##Variable
+CMPEQC(R19, 40, R20)					|| Check if R19 is already the fastest 
+BT(R20, skip)						|| Do not subtract if speed already the fastest
+SUBC(R19, 40, R19)					|| Reduce counter max value by 40, i.e. increase speed ##Variable
+skip:
 ADDC(R5, 1, R5) 					|| Increase rounds (ones) by 1
 CMPEQC(R5, 10, R21)					|| Check if rounds (ones) is 10
 BNE(R21, location_update_tens, R30)			|| Update rounds
