@@ -13,7 +13,7 @@ module player_led #(
   const ENCODING_AMOUNT = 8; // how many different encodings are used? 
   
   // ORANGE (111), SKY BLUE (110), PURPLE (101), YELLOW (100), BLUE (011), RED (010), GREEN (001), WHITE (000)
-  const LEDCOLOR = {24h00FF9A, 24hFF00FF, 24hFFFF00, 24h00FFFF, 24hFF0000, 24h00FF00, 24h0000FF, 24hFFFFFF}; 
+  const LEDCOLOR = {24h009AFF, 24hFFFF00, 24hFF00FF, 24h00FFFF, 24hFF0000, 24h0000FF, 24h00FF00, 24hFFFFFF}; 
   
   sig encoded_pixel_address[$clog2(PIXELS)*$clog2(ENCODING_AMOUNT)];
   sig current_color_encoding[$clog2(ENCODING_AMOUNT)];
