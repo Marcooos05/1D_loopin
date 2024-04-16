@@ -76,10 +76,10 @@ module au_top (
       h02: fastclock_edge.in = frequency_divider.value[14];
       h03: fastclock_edge.in = frequency_divider.value[12];
       h04: fastclock_edge.in = frequency_divider.value[10]; //count 1000, decrease by 5
-      h05: fastclock_edge.in = frequency_divider.value[8]; //increase count 
-      h06: fastclock_edge.in = frequency_divider.value[6];
-      h07: fastclock_edge.in = frequency_divider.value[4];
-      h08: fastclock_edge.in = frequency_divider.value[2];
+      h05: fastclock_edge.in = frequency_divider.value[9]; //increase count 
+      h06: fastclock_edge.in = frequency_divider.value[8];
+      h07: fastclock_edge.in = frequency_divider.value[7];
+      h08: fastclock_edge.in = frequency_divider.value[6];
       
       default:
       fastclock_edge.in = frequency_divider.value[20];

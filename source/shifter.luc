@@ -2,7 +2,7 @@ module shifter (
     input a[16],
     input b[5],
     input alufn_signal[6],
-    output shift[16]
+    output out[16]
   ) {
   mirror first_mirror;
   mux_2 mux_2_mirror[16];
@@ -42,7 +42,7 @@ module shifter (
       mux_2_final.in[i][0] = last_mirror_a[i];
     }
     
-    shift = mux_2_final.out;
+    out = mux_2_final.out;
   }
     
 }

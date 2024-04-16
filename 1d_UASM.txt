@@ -23,7 +23,7 @@ ADDC(R31, 1, R18)					|| Updating location on LED ring
 ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring 
 ADDC(R31, 1, R5)					|| Set round(ones) = 1
 ADDC(R31, 0, R6)					|| Set round(tens) = 0
-ADDC(R31, 5000, R19)					|| Set counter max value to 5000 ##VARIABLE
+ADDC(R31, 10000, R19)					|| Set counter max value to 10000 ##VARIABLE
 BEQ(R31, idle, R31)					|| Branching directly to idle 
 
 new_player1: 
@@ -81,7 +81,7 @@ ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring
 ADDC(R31, 0, R13) 					|| Reset counter to 0
 
 ||Faster & increase round count
-SUBC(R19, 50, R19)					|| Reduce counter max value by 50, i.e. increase speed ##Variable
+SUBC(R19, 200, R19)					|| Reduce counter max value by 50, i.e. increase speed ##Variable
 ADDC(R5, 1, R5) 					|| Increase rounds (ones) by 1
 CMPEQC(R5, 10, R21)					|| Check if rounds (ones) is 10
 BNE(R21, location_update_tens, R30)			|| Update rounds
