@@ -252,13 +252,13 @@ module motherboard (
         
       state.LOAD:
             // wait until we are at RESET state before we decide to refresh the screen
-            if (led_strip.reset){
+            //if (led_strip.reset){
                 // tell the LED to update the pixels
                 led_strip.update = 1;
                 led_encoding.d = temp_encoding.q;
                 state.d = state.IDLE;
                 
-            }
+            //}
     }
     
     

@@ -71,18 +71,18 @@ module au_top (
     // driving the beta 
     slowclock_edge.in = frequency_divider.value[27];
     case(io_dip[1]){
-      h00: fastclock_edge.in = frequency_divider.value[18];
-      h01: fastclock_edge.in = frequency_divider.value[16];
-      h02: fastclock_edge.in = frequency_divider.value[14];
-      h03: fastclock_edge.in = frequency_divider.value[12];
-      h04: fastclock_edge.in = frequency_divider.value[10]; //count 1000, decrease by 5
-      h05: fastclock_edge.in = frequency_divider.value[9]; //increase count 
-      h06: fastclock_edge.in = frequency_divider.value[8];
-      h07: fastclock_edge.in = frequency_divider.value[7];
-      h08: fastclock_edge.in = frequency_divider.value[6];
+      h00: fastclock_edge.in = frequency_divider.value[14];
+      h01: fastclock_edge.in = frequency_divider.value[12];
+      h02: fastclock_edge.in = frequency_divider.value[10]; //count 1000, decrease by 5
+      h03: fastclock_edge.in = frequency_divider.value[9];
+      h04: fastclock_edge.in = frequency_divider.value[8]; 
+      h05: fastclock_edge.in = frequency_divider.value[7]; //
+      h06: fastclock_edge.in = frequency_divider.value[6]; //Faster clock
+      h07: fastclock_edge.in = frequency_divider.value[5]; 
+      h08: fastclock_edge.in = frequency_divider.value[4];
       
       default:
-      fastclock_edge.in = frequency_divider.value[20];
+      fastclock_edge.in = frequency_divider.value[25];
     }
     // connect hardware interrupt button 
     //interrupt_button_conditioner.in = io_button[3:0];

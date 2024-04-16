@@ -1,4 +1,5 @@
-BEQ(R31, reset, R31)					|| reset handler 0x00000000
+
+BR(decrease_player_count)				|| reset handler 0x00000000
 BEQ(R31, illop, R31)						|| illop handler  0x00000004
 BEQ(R31, irq, R31)						|| irq handler    0x00000008
 
@@ -23,7 +24,7 @@ ADDC(R31, 1, R18)					|| Updating location on LED ring
 ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring 
 ADDC(R31, 1, R5)					|| Set round(ones) = 1
 ADDC(R31, 0, R6)					|| Set round(tens) = 0
-ADDC(R31, 10000, R19)					|| Set counter max value to 10000 ##VARIABLE
+ADDC(R31, 1000, R19)					|| Set counter max value to 10000 ##VARIABLE
 BEQ(R31, idle, R31)					|| Branching directly to idle 
 
 new_player1: 
@@ -81,7 +82,7 @@ ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring
 ADDC(R31, 0, R13) 					|| Reset counter to 0
 
 ||Faster & increase round count
-SUBC(R19, 200, R19)					|| Reduce counter max value by 50, i.e. increase speed ##Variable
+SUBC(R19, 20, R19)					|| Reduce counter max value by 50, i.e. increase speed ##Variable
 ADDC(R5, 1, R5) 					|| Increase rounds (ones) by 1
 CMPEQC(R5, 10, R21)					|| Check if rounds (ones) is 10
 BNE(R21, location_update_tens, R30)			|| Update rounds
@@ -167,8 +168,10 @@ decrease_player_count:
 SUBC(R7, 1, R7)						|| Reduce player count by 1
 CMPLEC(R7, 1, R20)					|| Check if player count <= 1
 BEQ(R20, idle, R31)					|| Branch back to idle if player count > 1
-CMOVE(0, R12)						|| Make sure that start button is reset before entering winning conditions
-ADDC(R31, 25000, R23)					|| Set max count for end state ##VARIABLE - currently 5-6 times of one location tick
+CMOVE(0, R12)					|| Make sure that start button is reset before entering winning conditions
+ADDC(R31, 30000, R23)					|| Set max count for end state ##VARIABLE - currently 5-6 times of one location tick
+ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
+ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
 CMPEQC(R0, 0, R20)					|| Check if player 1 is dead
 BEQ(R20, p1_win, R31)					|| Branch if player 1 alive
 CMPEQC(R1, 0, R20)					|| Check if player 2 is dead
@@ -177,20 +180,13 @@ CMPEQC(R2, 0, R20)					|| Check if player 3 is dead
 BEQ(R20, p3_win, R31)					|| Branch if player 3 alive
 CMPEQC(R3, 0, R20)					|| Check if player 4 is dead
 BEQ(R20, p4_win, R31)					|| Branch if player 4 alive
-
-ADDC(R31, 240, R4)					|| Display RED LED RING after single player ends
-CMOVE(1, R18)						|| Updating location on LED ring
-CMOVE(0, R18)						|| Reset R18 after updating LED ring
-BEQ(R31, end_game_loop, R31)				|| Branch to endgame without winner to display highest round count 
+BEQ(R31, end_game, R31)				|| Branch to endgame without winner to display highest round count 
 
 || WINNING CONDITION ||
 p1_win: 
 ADDC(R31, 241, R4)					|| Update location to F1 to indicate P1 win
 CMOVE(1, R18)						|| Updating location on LED ring
 CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
-||ADDC(R31, 241, R7)						|| Update player count to indicate p1 win ##REMOVE LINE 
-ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
 ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
 ADDC(R31, 1, R5)					|| Display 1 on 7-seg(ones)
 BEQ(R31, hold, R30)					|| Hold winner for some time
@@ -199,9 +195,6 @@ p2_win:
 ADDC(R31, 242, R4)					|| Update location to F2 to indicate P2 win
 CMOVE(1, R18)						|| Updating location on LED ring
 CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
-||ADDC(R31, 242, R7)						|| Update player count to indicate p2 win ##REMOVE LINE 
-ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
 ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
 ADDC(R31, 2, R5)					|| Display 2 on 7-seg(ones)
 BEQ(R31, hold, R30)					|| Hold winner for some time
@@ -210,9 +203,6 @@ p3_win:
 ADDC(R31, 243, R4)					|| Update location to indicate p3 win
 CMOVE(1, R18)						|| Updating location on LED ring
 CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
-||ADDC(R31, 243, R7)						|| Update player count to indicate p3 win ##REMOVE LINE 
-ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
 ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
 ADDC(R31, 3, R5)					|| Display 3 on 7-seg(ones)
 BEQ(R31, hold, R30)					|| Hold winner for some time
@@ -221,9 +211,6 @@ p4_win:
 ADDC(R31, 244, R4)					|| Update location to indicate p4 win
 CMOVE(1, R18)						|| Updating location on LED ring
 CMOVE(0, R18) 						|| Reset R18 after updating LED ring 
-||ADDC(R31, 244, R7)						|| Update player count to indicate p4 win ##REMOVE LINE 
-ADDC(R5, 0, R21)					|| Temporarily store rounds(ones) for endgame
-ADDC(R6, 0, R22)					|| Temporarily store rounds(tens) for endgame
 ADDC(R31, 15, R6)					|| Display P on 7-seg(tens)
 ADDC(R31, 4, R5)					|| Display 4 on 7-seg(ones)
 BEQ(R31, hold, R30)					|| Hold winner for some time
