@@ -25,7 +25,11 @@ ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring
 ADDC(R31, 1, R5)					|| Set round(ones) = 1
 ADDC(R31, 0, R6)					|| Set round(tens) = 0
 ADDC(R31, 1000, R19)					|| Set counter max value to 10000 ##VARIABLE
-BEQ(R31, idle, R31)					|| Branching directly to idle 
+BEQ(R31, waitstart, R31)				|| Branching directly to wait start right before idle state
+
+waitstart: 
+BNE(R12, idle, R31) 					|| Check if start button is pressed, if yes branch to idle start game
+BEQ(R31, waitstart, R31)				|| Loop back to wait start
 
 new_player1: 
 ADDC(R31, 5, R0) 					|| Populate 5 lives to Player 1 ##VARIABLE
