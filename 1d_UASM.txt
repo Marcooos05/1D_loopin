@@ -53,12 +53,13 @@ JMP(R30)						|| Return to PC+4 before branching
 
 || IDLE ||
 idle: 
+BNE(R12, speed_press, R30)
 BNE(R14, p1_button_press, R30)				|| ##NEW check if p1 pressed
 BNE(R15, p2_button_press, R30)				|| ##NEW check if p2 pressed
 BNE(R16, p3_button_press, R30)				|| ##NEW check if p3 pressed
 BNE(R17, p4_button_press, R30)				|| ##NEW check if p4 pressed
 ADDC(R13, 1, R13)					|| add one to counter
-CMPEQ(R13, R19, R20)					|| check if counter = counter max, store result in R20
+CMPLE(R19, R13, R20)					|| check if counter = counter max, store result in R20
 BNE(R20, update_location, R31)				|| update location when R20 = 1
 BEQ(R31, idle, R31)					|| Loop back to idle
 
@@ -86,9 +87,9 @@ ADDC(R31, 0, R18) 					|| Reset R18 after updating LED ring
 ADDC(R31, 0, R13) 					|| Reset counter to 0
 
 ||Faster & increase round count
-CMPEQC(R19, 4, R20)					|| Check if R19 is already the fastest 
+CMPLEC(R19, 2, R20)					|| Check if R19 is already the fastest 
 BT(R20, skip)						|| Do not subtract if speed already the fastest
-SUBC(R19, 4, R19)					|| Reduce counter max value by 4, i.e. increase speed ##Variable
+SUBC(R19, 2, R19)					|| Reduce counter max value by 2, i.e. increase speed ##Variable
 skip:
 ADDC(R5, 1, R5) 					|| Increase rounds (ones) by 1
 CMPEQC(R5, 10, R21)					|| Check if rounds (ones) is 10
@@ -126,6 +127,13 @@ BEQ(R31, idle, R31)		 			|| Branch back to idle
 || BUTTON PRESS EVENT ||
 return_back:
 JMP(R30)						|| return to previous running line
+
+speed_press:
+CMOVE(0, R12)
+CMPLTC(R19, 8, R20)					|| Check if R19 is already the fastest 
+BT(R20, return_back)					|| Do not subtract if speed already the fastest
+SUBC(R19, 6, R19)					|| Reduce counter max value by 2, i.e. increase speed ##Variable
+BR(return_back)
 
 p1_button_press: 
 BEQ(R0, return_back, R31)				|| Branch to return_back branch if no lives
