@@ -2,16 +2,22 @@
 
 This repository contains the source code that implements 32-bit Beta CPU in Lucid programming language. 
 Simply open `beta-32-document.alp` with [Alchitry Lab](https://alchitry.com/alchitry-labs), **compile**, and **flash** it to Alchitry Au + Alchitry Io Element Board.
-Within the Beta CPU contains a set of 200 lines of instructions that is used to run Techno Twirl.
+The Beta CPU contains a set of 200 lines of instructions that are used to run Techno Twirl.
 
-### Details about the Techno Twirl
+### Details about Looping Louie
 
 Techno Twirl is inspired by a childhood game named Looping Louie. 
 Looping Louie is a tabletop board game where players compete to protect their precious tokens from the swooping attacks of Louie, the daring pilot. Louie, flying his plane in loops, attempts to steal players' tokens using his spinning plane. The last player with tokens left standing wins the game!
 Players take turns activating a lever to flip Louie's plane, attempting to protect their tokens while trying to knock out opponents' tokens. With each round, the tension builds as Louie's plane swoops lower and faster, testing players' reflexes and strategic prowess.
 ![Looping Louie Board Game](img/looping-louie.jpg)
 
-### Running the Beta
+### Details on Techno Twirl
+
+Inspired by the fast-paced, family-friendly and exciting board game, we developed Techno Twirl which runs on Lucid Programming language. 
+In place of Pilot Louie, we use lights to display the current location of Louie. 
+At the start of each game, players are allocated 5 lives. As Louie loops around the board on his bright blue display, players press their respective buttons to prevent Louie from taking away their lives. In Techno Twirl, players are discouraged from spamming on the button when Louie is not at their location, we do so by implementing the rule that players will lose a live if they do press their button even though Louie is not at their location.
+
+![Looping Louie Board Game](img/Final.mp4)
 
 Ensure that **ALL** `io_dip` is switched OFF when flashing the binary.
 
