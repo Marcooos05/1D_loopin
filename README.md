@@ -9,7 +9,7 @@ Within the Beta CPU contains a set of 200 lines of instructions that is used to 
 Techno Twirl is inspired by a childhood game named Looping Louie. 
 Looping Louie is a tabletop board game where players compete to protect their precious tokens from the swooping attacks of Louie, the daring pilot. Louie, flying his plane in loops, attempts to steal players' tokens using his spinning plane. The last player with tokens left standing wins the game!
 Players take turns activating a lever to flip Louie's plane, attempting to protect their tokens while trying to knock out opponents' tokens. With each round, the tension builds as Louie's plane swoops lower and faster, testing players' reflexes and strategic prowess.
-![Looping Louie Board Game]([http://url/to/img.png](https://images-na.ssl-images-amazon.com/images/I/51la98ydz0L.jpg))
+![Looping Louie Board Game](img/looping-louie.jpg)
 
 ### Running the Beta
 
