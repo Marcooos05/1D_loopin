@@ -16,8 +16,12 @@ Players take turns activating a lever to flip Louie's plane, attempting to prote
 Inspired by the fast-paced, family-friendly and exciting board game, we developed Techno Twirl which runs on Lucid Programming language. 
 In place of Pilot Louie, we use lights to display the current location of Louie. 
 At the start of each game, players are allocated 5 lives. As Louie loops around the board on his bright blue display, players press their respective buttons to prevent Louie from taking away their lives. In Techno Twirl, players are discouraged from spamming on the button when Louie is not at their location, we do so by implementing the rule that players will lose a live if they do press their button even though Louie is not at their location.
-
 ![Looping Louie Board Game](img/Final.gif)
+
+### Features of the game
+At the start of each game, players need to hold down their buttons to secure their participation in the game and press the middle start button to populate their lives. Once all players are ready, press the middle start button again so that Louie will start making his rounds. 
+
+After each round, Louie will start moving slightly faster. Players can also press the middle button during the game to get Louie to speed up. Once there is only one player left, the game will stop and display the color of the player that survived the longest. 
 
 Ensure that **ALL** `io_dip` is switched OFF when flashing the binary.
 
