@@ -1,16 +1,48 @@
 module shifter (
-    input a[32],
+    input a[16],
     input b[5],
     input alufn_signal[6],
-    output out[32]
+    output out[16]
   ) {
-
+  mirror first_mirror;
+  mux_2 mux_2_mirror[16];
+  mux_2 mux_2_padding;
+  sixteen_bit_right_shifter right_shift;
+  mirror last_mirror;
+  mux_2 mux_2_final[16];
+  
+  var i;
+  sig mirror_a[16], last_mirror_a[16];
   always {
-  case (alufn_signal){
-    default: out = a;
-    b100000: out = a << b;
-    b100001: out = a >> b;
-    b100011: out = $signed(a) >>> b;
+    first_mirror.a = a;
+    mirror_a = first_mirror.out;
+    
+    mux_2_mirror.s0 = 16x{alufn_signal[0]};
+    for(i = 0; i<16; i++){
+    //since using a right shifter, if alufn 0, mirror, else no mirror.
+      mux_2_mirror.in[i][1] = a[i];
+      mux_2_mirror.in[i][0] = mirror_a[i];
     }
+    
+    mux_2_padding.s0 = alufn_signal[1];
+    mux_2_padding.in = c{a[15],b0};
+    //if alufn 1 pad with a[15]
+    
+    right_shift.a = mux_2_mirror.out;
+    right_shift.pad = mux_2_padding.out;
+    right_shift.b = b;
+    
+    last_mirror.a = right_shift.out;
+    last_mirror_a = last_mirror.out;
+    
+    mux_2_final.s0 = 16x{alufn_signal[0]};
+    for(i = 0; i<16; i++){
+    //since using a right shifter, if alufn 0, mirror, else no mirror.
+      mux_2_final.in[i][1] = right_shift.out[i];
+      mux_2_final.in[i][0] = last_mirror_a[i];
+    }
+    
+    out = mux_2_final.out;
   }
+    
 }

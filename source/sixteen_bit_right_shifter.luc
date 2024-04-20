@@ -1,0 +1,34 @@
+module sixteen_bit_right_shifter (
+    input a[16],
+    input b[5],
+    input pad,
+    output out[16]
+  ) {
+x_bit_right_shifter shifter8(#SHIFT(8));
+x_bit_right_shifter shifter4(#SHIFT(4));
+x_bit_right_shifter shifter2(#SHIFT(2));
+x_bit_right_shifter shifter1(#SHIFT(1));
+sig x[16],y[16],z[16];
+  always {
+  
+    shifter8.a = a;
+    shifter8.shift = b[3];
+    shifter8.pad = pad;
+    x = shifter8.out;
+    
+    shifter4.a = x;
+    shifter4.shift = b[2];
+    shifter4.pad = pad;
+    y = shifter4.out;
+    
+    shifter2.a = y;
+    shifter2.shift = b[1];
+    shifter2.pad = pad;
+    z = shifter2.out;
+    
+    shifter1.a = z;
+    shifter1.shift = b[0];
+    shifter1.pad = pad;
+    out = shifter1.out;
+  }
+}

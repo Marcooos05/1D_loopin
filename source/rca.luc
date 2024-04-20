@@ -1,0 +1,29 @@
+module rca (
+    input a[16],
+    input b[16],
+    input alufn, 
+    output s[16]
+  ) {
+fa fa[16];
+  var i;
+  sig xb[16];
+
+  always {
+  
+    for (i=0; i<16; i++){ // computing signal xb
+      xb[i] = b[i] ^ alufn;
+    } 
+    // set the input to the first unit (LSB) of the RCA
+    fa.a[0] = a[0];
+    fa.b[0] = xb[0];
+    fa.ci[0] = alufn;
+    
+    for (i=1; i<16; i++){ // other 15 units of RCA
+      fa.a[i] = a[i];
+      fa.b[i] = xb[i];
+      fa.ci[i] = fa.co[i-1];
+    }
+    
+    s = fa.s;
+  }
+}

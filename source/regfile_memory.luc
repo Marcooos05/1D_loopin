@@ -36,12 +36,13 @@ module regfile_memory (
 
     // TASK 7 
     //always read 
+    //remember that decimal 18 in hex is 12
     reg_data_1 = registers.q[read_address_1];
     reg_data_2 = registers.q[read_address_2];
     r0_data = registers.q[5h0]; // testing to read the button input after, change back to 5h0-5h3 for register 0-1
-    r1_data = registers.q[5h1]; //remember that decimal 18 in hex is 12
-    r2_data = registers.q[5h2];
-    r3_data = registers.q[5h3];
+    r1_data = registers.q[5h1];  
+    r2_data = registers.q[5h2]; 
+    r3_data = registers.q[5h3]; 
     r4_data = registers.q[5h4];
     r5_data = registers.q[5h5];
     r6_data = registers.q[5h6];
@@ -51,7 +52,7 @@ module regfile_memory (
     registers.d[5hA] = r10_data;
     registers.d[5hB] = r11_data;
     
-    if (r12_data_rise == 1 && registers.q[5hC] == 0){ // when p4 button is pressed and the reg file is empty, then reg 17 will hold 1 
+    if (r12_data_rise == 1 && registers.q[5hC] == 0){ // when start button is pressed and the reg file is empty, then reg 12 will hold 1 
         registers.d[5hC] = 32h1; 
     }
     if (r8_data_rise == 1 && registers.q[5hE] == 0){ // when p1 button is pressed and the reg file is empty, then reg 14 will hold 1 

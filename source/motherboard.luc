@@ -44,7 +44,7 @@ module motherboard (
   beta_cpu beta(.clk(clk));
   
   // setup and instantiate memory unit and instruction ROM
-  const MEMORY_SIZE = 32;
+  const MEMORY_SIZE = 256;
   instruction_rom instruction_unit(#WORDS(MEMORY_SIZE));
   memory_unit memory_unit(#WORDS(MEMORY_SIZE), .clk(clk)); 
   
@@ -64,9 +64,9 @@ module motherboard (
 
   const PIXEL_COUNT = COLUMN_DIMENSION *  ROW_DIMENSION;   
   const ENCODING_AMOUNT = 8; // how many different encodings are used? 
-  
+
   // ORANGE (111), SKY BLUE (110), PURPLE (101), YELLOW (100), BLUE (011), RED (010), GREEN (001), WHITE (000)
-  const LEDCOLOR = {24h00FF9A, 24hFF00FF, 24hFFFF00, 24h00FFFF, 24hFF0000, 24h00FF00, 24h0000FF, 24hFFFFFF}; 
+  const LEDCOLOR = {24h009AFF, 24hFFFF00, 24hFF00FF, 24h00FFFF, 24hFF0000, 24h0000FF, 24h00FF00, 24hFFFFFF}; 
   
   sig encoded_pixel_address[$clog2(PIXEL_COUNT)*$clog2(ENCODING_AMOUNT)];
   sig current_color_encoding[$clog2(ENCODING_AMOUNT)];
@@ -81,8 +81,10 @@ module motherboard (
   // TODO: change this to suit your dimension
   
   
+  
   dff led_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(0)); // 2 bit to encode a color per pixel
-  dff temp_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(ROW_DIMENSIONx{16h000F})); // holds temporary value (double buffering)
+                                                                                                                                      //starting light display
+  dff temp_encoding[PIXEL_COUNT*$clog2(ENCODING_AMOUNT)](.clk(clk), .rst(rst), #INIT(4x{c{3x{3b111}, 3x{3b110}, 3x{3b101}, 3x{3b100}}})); // holds temporary value (double buffering)
   
   ws2812b_writer led_strip(#PIXEL_COUNT(PIXEL_COUNT), .clk(clk), .rst(rst)); 
   fsm state(.clk(clk), .rst(rst)) = {INIT, LOAD, IDLE};
@@ -215,23 +217,30 @@ module motherboard (
              if (beta.r18_change_loc){
                 // ORANGE (111), SKY BLUE (110), PURPLE (101), YELLOW (100), BLUE (011), RED (010), GREEN (001), WHITE (000)
                 case(beta.r4_location){
-                  h00:temp_encoding.d = c{48x{b000}};
-                  h01:temp_encoding.d = c{3x{b011}, 45x{b000}};
-                  h02:temp_encoding.d = c{3x{b000}, 3x{b011}, 42x{b000}};
-                  h03:temp_encoding.d = c{6x{b000}, 3x{b011}, 39x{b000}};
-                  h04:temp_encoding.d = c{9x{b000}, 3x{b011}, 36x{b000}};
-                  h05:temp_encoding.d = c{12x{b000}, 3x{b011}, 33x{b000}};
-                  h06:temp_encoding.d = c{15x{b000}, 3x{b011}, 30x{b000}};
-                  h07:temp_encoding.d = c{18x{b000}, 3x{b011}, 27x{b000}};
-                  h08:temp_encoding.d = c{21x{b000}, 3x{b011}, 24x{b000}};
-                  h09:temp_encoding.d = c{24x{b000}, 3x{b011}, 21x{b000}};
-                  h0A:temp_encoding.d = c{27x{b000}, 3x{b011}, 18x{b000}};
-                  h0B:temp_encoding.d = c{30x{b000}, 3x{b011}, 15x{b000}};
-                  h0C:temp_encoding.d = c{33x{b000}, 3x{b011}, 12x{b000}};
-                  h0D:temp_encoding.d = c{36x{b000}, 3x{b011}, 9x{b000}};
-                  h0E:temp_encoding.d = c{39x{b000}, 3x{b011}, 6x{b000}};
-                  h0F:temp_encoding.d = c{42x{b000}, 3x{b011}, 3x{b000}};
-                  h10:temp_encoding.d = c{45x{b000}, 3x{b011}};
+                  h00:temp_encoding.d = 48x{b000};
+                  h01:temp_encoding.d = c{45x{b000}, 3x{b011}};
+                  h02:temp_encoding.d = c{42x{b000}, 3x{b011}, 3x{b000}};
+                  h03:temp_encoding.d = c{39x{b000}, 3x{b011}, 6x{b000}};
+                  h04:temp_encoding.d = c{36x{b000}, 3x{b011}, 9x{b000}};
+                  h05:temp_encoding.d = c{33x{b000}, 3x{b011}, 12x{b000}};
+                  h06:temp_encoding.d = c{30x{b000}, 3x{b011}, 15x{b000}};
+                  h07:temp_encoding.d = c{27x{b000}, 3x{b011}, 18x{b000}};
+                  h08:temp_encoding.d = c{24x{b000}, 3x{b011}, 21x{b000}};
+                  h09:temp_encoding.d = c{21x{b000}, 3x{b011}, 24x{b000}};
+                  h0A:temp_encoding.d = c{18x{b000}, 3x{b011}, 27x{b000}};
+                  h0B:temp_encoding.d = c{15x{b000}, 3x{b011}, 30x{b000}};
+                  h0C:temp_encoding.d = c{12x{b000}, 3x{b011}, 33x{b000}};
+                  h0D:temp_encoding.d = c{9x{b000}, 3x{b011}, 36x{b000}};
+                  h0E:temp_encoding.d = c{6x{b000}, 3x{b011}, 39x{b000}};
+                  h0F:temp_encoding.d = c{3x{b000}, 3x{b011}, 42x{b000}};
+                  h10:temp_encoding.d = c{3x{b011}, 45x{b000}};
+            
+                  hE0:temp_encoding.d = 4x{c{3x{3b111}, 3x{3b110}, 3x{3b101}, 3x{3b100}}};
+                  hF0:temp_encoding.d = 48x{b010};
+                  hF1:temp_encoding.d = 48x{b100};
+                  hF2:temp_encoding.d = 48x{b101};
+                  hF3:temp_encoding.d = 48x{b110};
+                  hF4:temp_encoding.d = 48x{b111};
                 }
                 state.d = state.LOAD;
               }
@@ -268,15 +277,16 @@ module motherboard (
     //player 1-4 buttons led 
     player_outled.rise = player_rise;
     player_outled.fall = player_fall;
+    player_outled.location = {beta.r4_location[7:0],beta.r4_location[7:0],beta.r4_location[7:0],beta.r4_location[7:0]};
     player_outled.live[0] = beta.r0_p1_live;
     player_outled.live[1] = beta.r1_p2_live;
     player_outled.live[2] = beta.r2_p3_live;
     player_outled.live[3] = beta.r3_p4_live;
     
-    player_outled.colorbit[0] = b101;
-    player_outled.colorbit[1] = b100;
+    player_outled.colorbit[0] = b100;
+    player_outled.colorbit[1] = b101;
     player_outled.colorbit[2] = b110;
-    player_outled.colorbit[3] = b001;
+    player_outled.colorbit[3] = b111;
     output_p1_led = player_outled.out[0];
     output_p2_led = player_outled.out[1];
     output_p3_led = player_outled.out[2];
