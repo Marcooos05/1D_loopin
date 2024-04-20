@@ -1,12 +1,15 @@
 ## 32-bit Beta CPU
 
-This repository contains the source code that implements 32-bit Beta CPU in Lucid programming language. Simply open `BetaComponents32.alp` with [Alchitry Lab](https://alchitry.com/alchitry-labs), **compile**, and **flash** it to Alchitry Au + Alchitry Io Element Board.
+This repository contains the source code that implements 32-bit Beta CPU in Lucid programming language. 
+Simply open `beta-32-document.alp` with [Alchitry Lab](https://alchitry.com/alchitry-labs), **compile**, and **flash** it to Alchitry Au + Alchitry Io Element Board.
+Within the Beta CPU contains a set of 200 lines of instructions that is used to run Techno Twirl.
 
-### Instruction Data
+### Details about the Techno Twirl
 
-Currently, only 28 instructions are hardcoded inside `instruction_rom.luc`. These instructions are designed to _loop_ to make it easier to demonstrate the workings of the Beta CPU. You may change the content of this instruction rom to load any Beta CPU instruction.
-
-Please change `const MEMORY_SIZE` in `au_top.luc` to match your custom instruction.
+Techno Twirl is inspired by a childhood game named Looping Louie. 
+Looping Louie is a tabletop board game where players compete to protect their precious tokens from the swooping attacks of Louie, the daring pilot. Louie, flying his plane in loops, attempts to steal players' tokens using his spinning plane. The last player with tokens left standing wins the game!
+Players take turns activating a lever to flip Louie's plane, attempting to protect their tokens while trying to knock out opponents' tokens. With each round, the tension builds as Louie's plane swoops lower and faster, testing players' reflexes and strategic prowess.
+![Looping Louie Board Game]([http://url/to/img.png](https://images-na.ssl-images-amazon.com/images/I/51la98ydz0L.jpg))
 
 ### Running the Beta
 
